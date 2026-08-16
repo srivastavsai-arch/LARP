@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>License — LARP™</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="StaggeredMenu.css">
+<style>
+:root{--accent:#5227FF;}
+
+/* editorial frame */
+.acct-micro{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  display:flex;align-items:center;gap:12px;opacity:.6;
+  margin-bottom:clamp(24px,4vw,44px);
+}
+.acct-micro .dot{width:7px;height:7px;border-radius:50%;background:var(--black);flex:0 0 7px;}
+.acct-micro .acct-micro-page{margin-left:auto;letter-spacing:.12em;}
+
+.license-stage{
+  min-height:100svh;
+  position:relative;
+  padding:calc(var(--nav-h) + clamp(20px,4vw,44px)) var(--gutter) clamp(60px,9vw,120px);
+}
+.license-grid{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);
+  gap:clamp(40px,6vw,90px);align-items:center;
+}
+@media (max-width:900px){
+  .license-grid{grid-template-columns:1fr;gap:clamp(36px,6vw,56px);}
+  .license-info{order:2;}
+  .license-card-col{order:1;}
+}
+.license-word{
+  font-family:var(--font-display);
+  font-size:clamp(34px,8vw,172px);
+  line-height:.88;text-transform:uppercase;letter-spacing:-.01em;
+}
+.license-sub{
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+  opacity:.55;max-width:34ch;margin-top:18px;line-height:1.75;
+}
+.license-actions{
+  display:flex;flex-direction:column;
+  margin-top:clamp(32px,5vw,50px);max-width:440px;
+}
+.license-action{
+  display:flex;align-items:center;gap:14px;text-align:left;cursor:pointer;
+  padding:clamp(16px,2.4vw,22px) clamp(6px,1vw,12px);
+  border-top:1px solid var(--line-strong);
+  font-family:var(--font-display);font-size:clamp(19px,3vw,28px);
+  text-transform:uppercase;letter-spacing:-.01em;
+  color:inherit;text-decoration:none;
+  transition:padding-left .35s var(--ease),color .3s;
+}
+.license-action:last-child{border-bottom:1px solid var(--line-strong);}
+.license-action .dot{width:8px;height:8px;border-radius:50%;background:var(--black);flex:0 0 8px;transition:transform .35s var(--ease),background .3s;}
+.license-action .arrow{margin-left:auto;font-size:.75em;transition:transform .35s var(--ease);}
+.license-action:hover{padding-left:18px;color:var(--accent);}
+.license-action:hover .dot{transform:scale(1.6);background:var(--accent);}
+.license-action:hover .arrow{transform:translateX(8px);}
+.license-action.is-primary{
+  display:inline-flex;align-self:flex-start;
+  background:var(--black);color:var(--white);border-radius:999px;
+  padding:clamp(16px,2.4vw,22px) clamp(26px,4vw,38px);
+  border-top:none;border-bottom:none;margin-bottom:clamp(8px,1.5vw,14px);
+  transition:gap .35s var(--ease),transform .35s var(--ease),background .3s;
+}
+.license-action.is-primary:hover{padding-left:clamp(26px,4vw,38px);gap:22px;transform:translateY(-2px);background:#151515;color:var(--white);}
+.license-action.is-primary .dot{background:var(--white);}
+.license-action.is-primary:hover .dot{background:var(--accent);}
+
+/* card column */
+.license-card-col{display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.card-outer{
+  width:min(86vw,430px);
+  aspect-ratio:85.6 / 53.98;
+  position:relative;
+  perspective:1400px;
+}
+.card{
+  width:100%;height:100%;position:relative;
+  transform-style:preserve-3d;
+  cursor:pointer;
+}
+.card-face{
+  position:absolute;inset:0;
+  border-radius:5.2%/8.3%;
+  border:1px solid var(--black);
+  backface-visibility:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--white);
+  padding:6%;
+  overflow:hidden;
+}
+.card-face-back{transform:rotateY(180deg);justify-content:space-between;padding:8% 8%;}
+.card-front-word{
+  font-family:var(--font-display);font-size:clamp(38px,13vw,64px);text-transform:uppercase;letter-spacing:-.01em;
+}
+.card-front-sub{
+  position:absolute;bottom:8%;left:8%;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;opacity:.5;
+}
+.card-front-corner{
+  position:absolute;top:8%;right:8%;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;opacity:.5;
+}
+.card-back-top{width:100%;text-align:center;}
+.card-back-title{font-family:var(--font-mono);font-size:clamp(10px,2vw,12px);letter-spacing:.14em;text-transform:uppercase;}
+.card-back-sep{width:60%;height:1px;background:var(--black);opacity:.5;margin:5% auto;}
+.card-back-star{font-size:clamp(12px,2.4vw,16px);margin:2% 0;}
+.card-back-mid{width:100%;text-align:center;}
+.card-back-name{font-family:var(--font-mono);font-size:clamp(11px,2.1vw,13px);letter-spacing:.06em;margin-bottom:4px;}
+.card-back-memno{font-family:var(--font-mono);font-size:clamp(11px,2.1vw,13px);letter-spacing:.06em;opacity:.7;}
+.card-back-copy{
+  font-family:var(--font-body);font-size:clamp(8px,1.6vw,9.5px);line-height:1.5;text-align:center;
+  max-width:88%;opacity:.75;
+}
+.card-back-tag{font-family:var(--font-mono);font-size:clamp(8.5px,1.7vw,10px);letter-spacing:.1em;text-transform:uppercase;text-align:center;}
+.card-hint{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  opacity:.45;margin-top:26px;text-align:center;
+}
+
+/* toast */
+.acct-toast{
+  position:fixed;left:50%;bottom:clamp(24px,5vw,48px);
+  transform:translateX(-50%) translateY(22px);
+  background:var(--black);color:var(--white);
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  padding:15px 28px;border-radius:999px;
+  opacity:0;pointer-events:none;z-index:900;
+  transition:opacity .4s var(--ease),transform .4s var(--ease);
+}
+.acct-toast.is-on{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div id="menu-root" aria-label="Main navigation"></div>
+<div class="acct-toast" id="acctToast" role="status"></div>
+
+<main class="wrap license-stage" id="stage">
+  <!-- filled by script depending on session state -->
+</main>
+
+<script src="app.js"></script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react" src="StaggeredMenu.jsx"></script>
+<script type="text/babel" data-presets="react" src="menu-mount.jsx"></script>
+
+<script>
+const stage = document.getElementById('stage');
+const session = LarpSession.current();
+const toastEl = document.getElementById('acctToast');
+let toastTimer = null;
+
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('is-on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>toastEl.classList.remove('is-on'), 2000);
+}
+
+function initCard(){
+  const card = document.getElementById('licenseCard');
+  if(!card) return;
+  const outer = card.parentElement;
+  const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  const maxTilt = 13;
+
+  let flipped = false;
+  let targetX = 0, targetY = 0, curX = 0, curY = 0;
+  let raf = null;
+
+  function apply(){
+    const rotY = flipped ? 180 - curX : curX;
+    card.style.transform = 'rotateY(' + rotY + 'deg) rotateX(' + curY + 'deg)';
+  }
+  function loop(){
+    curX += (targetX - curX) * 0.13;
+    curY += (targetY - curY) * 0.13;
+    apply();
+    if(Math.abs(targetX - curX) > 0.06 || Math.abs(targetY - curY) > 0.06){
+      raf = requestAnimationFrame(loop);
+    } else {
+      raf = null;
+      apply();
+    }
+  }
+  function startLoop(){ if(!raf) raf = requestAnimationFrame(loop); }
+  function stopLoop(){ if(raf){ cancelAnimationFrame(raf); raf = null; } }
+
+  function toggleFlip(){
+    flipped = !flipped;
+    targetX = 0; targetY = 0;
+    startLoop();
+  }
+  window.__licenseFlip = toggleFlip;
+
+  if(!isTouch){
+    outer.addEventListener('mousemove', (e)=>{
+      const r = outer.getBoundingClientRect();
+      targetX = ((e.clientX - r.left) / r.width - 0.5) * maxTilt * 2;
+      targetY = -((e.clientY - r.top) / r.height - 0.5) * maxTilt * 2;
+      startLoop();
+    });
+    outer.addEventListener('mouseleave', ()=>{ targetX = 0; targetY = 0; });
+    outer.addEventListener('click', toggleFlip);
+  } else {
+    let startX = 0, startY = 0, dragging = false, moved = false;
+    outer.addEventListener('touchstart', (e)=>{
+      const t = e.touches[0];
+      startX = t.clientX; startY = t.clientY;
+      dragging = true; moved = false;
+    }, {passive:true});
+    outer.addEventListener('touchmove', (e)=>{
+      if(!dragging) return;
+      const t = e.touches[0];
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      if(Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true;
+      const r = outer.getBoundingClientRect();
+      targetX = (dx / r.width) * maxTilt * 2;
+      targetY = -(dy / r.height) * maxTilt * 2;
+      startLoop();
+    }, {passive:true});
+    outer.addEventListener('touchend', ()=>{
+      dragging = false;
+      targetX = 0; targetY = 0;
+      if(!moved) toggleFlip();
+    });
+  }
+}
+
+function downloadLicense(){
+  if(!session) return;
+  const w = 856, h = 540;
+  const rx = 30;
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">' +
+      '<rect width="100%" height="100%" fill="#ffffff"/>' +
+      '<rect x="2" y="2" width="'+(w-4)+'" height="'+(h-4)+'" rx="'+rx+'" fill="#ffffff" stroke="#000000" stroke-width="4"/>' +
+      '<text x="'+(w/2)+'" y="'+(h/2+22)+'" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="150" font-weight="900" fill="#000000">LARP</text>' +
+      '<text x="80" y="'+(h-44)+'" font-family="monospace" font-size="26" letter-spacing="5" fill="#000000">LICENSE TO LARP</text>' +
+      '<text x="'+(w-80)+'" y="'+(h-44)+'" text-anchor="end" font-family="monospace" font-size="26" letter-spacing="2" fill="#000000">'+esc(session.m)+'</text>' +
+    '</svg>';
+  const blob = new Blob([svg], {type:'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'LARP-license.svg';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+
+function saveLicense(){
+  const p = new URLSearchParams(location.search);
+  p.set('saved','1');
+  if(session) LarpSession.toParams(session).forEach((v,k)=>p.set(k,v));
+  history.replaceState(null, '', location.pathname + (p.toString() ? '?'+p.toString() : ''));
+  toast('License saved.');
+}
+
+function wireActions(){
+  const genBtn = document.getElementById('genLicenseBtn');
+  const flipBtn = document.getElementById('flipCardBtn');
+  const saveBtn = document.getElementById('saveLicenseBtn');
+  const dlBtn = document.getElementById('downloadBtn');
+  if(genBtn) genBtn.addEventListener('click', ()=>{ renderCard(session); toast('License generated.'); });
+  if(flipBtn) flipBtn.addEventListener('click', ()=>{ if(window.__licenseFlip) window.__licenseFlip(); });
+  if(saveBtn) saveBtn.addEventListener('click', saveLicense);
+  if(dlBtn) dlBtn.addEventListener('click', downloadLicense);
+}
+
+function renderCard(session){
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  stage.innerHTML = `
+    <div class="license-grid">
+      <div class="license-info">
+        <div class="acct-micro">Member license <span class="dot"></span> <span class="acct-micro-page">CR80 / 06</span></div>
+        <h1 class="license-word">LICENSE</h1>
+        <p class="license-sub">A CR80 laminate certifying the holder as an official practitioner of LARPing in all forms and fictions.</p>
+        <div class="license-actions">
+          <button type="button" class="license-action is-primary" id="genLicenseBtn"><span class="dot"></span><span>Generate License</span><span class="arrow">→</span></button>
+          <button type="button" class="license-action" id="flipCardBtn"><span class="dot"></span><span>Flip Card</span><span class="arrow">→</span></button>
+          <button type="button" class="license-action" id="saveLicenseBtn"><span class="dot"></span><span>Save License</span><span class="arrow">→</span></button>
+          <button type="button" class="license-action" id="downloadBtn"><span class="dot"></span><span>Download</span><span class="arrow">→</span></button>
+        </div>
+      </div>
+      <div class="license-card-col">
+        <div class="card-outer">
+          <div class="card" id="licenseCard">
+            <div class="card-face card-face-front">
+              <div class="card-front-word">LARP</div>
+              <div class="card-front-sub">License to LARP</div>
+              <div class="card-front-corner">${session.m}</div>
+            </div>
+            <div class="card-face card-face-back">
+              <div class="card-back-top">
+                <div class="card-back-title">License to LARP</div>
+                <div class="card-back-sep"></div>
+              </div>
+              <div class="card-back-star">★</div>
+              <div class="card-back-mid">
+                <div class="card-back-name">NAME: ${esc(session.n).toUpperCase()}</div>
+                <div class="card-back-memno">MEMBERSHIP NO: ${session.m}</div>
+              </div>
+              <div class="card-back-copy">This card certifies the holder as an official practitioner of LARPing in all forms and fictions.</div>
+              <div class="card-back-tag">LARP freely. LARP boldly.</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-hint">Move to tilt · click to flip</div>
+      </div>
+    </div>
+  `;
+  initCard();
+  wireActions();
+}
+
+function renderLocked(){
+  stage.innerHTML = `
+    <div class="license-grid">
+      <div class="license-info">
+        <div class="acct-micro">Member license <span class="dot"></span> <span class="acct-micro-page">CR80 / 06</span></div>
+        <h1 class="license-word">No license<br>on file yet.</h1>
+        <p class="license-sub">Register for free to generate your membership number and unlock your CR80 license.</p>
+        <div class="license-actions">
+          <a href="account.html?mode=register" class="license-action is-primary" data-carry-session><span class="dot"></span><span>Generate License</span><span class="arrow">→</span></a>
+          <a href="account.html?mode=signin" class="license-action" data-carry-session><span class="dot"></span><span>Sign in</span><span class="arrow">→</span></a>
+        </div>
+      </div>
+      <div class="license-card-col">
+        <div class="card-outer">
+          <div class="card">
+            <div class="card-face card-face-front">
+              <div class="card-front-word" style="opacity:.22;">LARP</div>
+              <div class="card-front-sub">License to LARP</div>
+              <div class="card-front-corner">LOCKED</div>
+            </div>
+          </div>
+        </div>
+        <div class="card-hint">Your license appears after registration.</div>
+      </div>
+    </div>
+  `;
+  LarpSession.propagateToLinks();
+}
+
+if(session){
+  renderCard(session);
+} else {
+  renderLocked();
+}
+</script>
+</body>
+</html>

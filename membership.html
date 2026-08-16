@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Membership — LARP™</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.plans{display:flex;flex-direction:column;}
+.plan{
+  border-top:1px solid var(--line);
+  padding:clamp(28px,4.5vw,44px) 0;
+  display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:18px;
+  cursor:pointer;transition:padding .35s var(--ease);
+}
+.plan:last-child{border-bottom:1px solid var(--line);}
+.plan-name{font-family:var(--font-display);font-size:clamp(28px,5vw,52px);text-transform:uppercase;transition:font-size .35s var(--ease);}
+.plan-price{font-family:var(--font-mono);font-size:clamp(15px,2vw,20px);letter-spacing:.04em;opacity:.7;text-align:right;white-space:nowrap;}
+.plan-detail{
+  grid-column:1/-1;max-height:0;overflow:hidden;opacity:0;
+  transition:max-height .4s var(--ease),opacity .3s var(--ease),margin-top .4s var(--ease);
+}
+.plan.is-active .plan-detail{max-height:200px;opacity:1;margin-top:18px;}
+.plan.is-active .plan-name{font-size:clamp(34px,6.4vw,72px);}
+.plan-detail-body{font-size:14.5px;opacity:.7;max-width:44ch;margin-bottom:16px;}
+.plan-arrow{font-family:var(--font-mono);font-size:13px;transition:transform .35s var(--ease);}
+.plan.is-active .plan-arrow{transform:rotate(90deg);}
+</style>
+</head>
+<body>
+
+<div id="menu-root" aria-label="Main navigation"></div>
+
+<main class="wrap">
+  <header class="page-head">
+    <div class="page-eyebrow">Membership</div>
+    <h1 class="page-title">Pick your<br>level of<br>commitment.</h1>
+    <p class="page-sub">Three tiers. One bit. Tap a plan to see what it gets you.</p>
+  </header>
+
+  <section class="plans" id="plans">
+    <div class="plan" data-tier="LARP" data-plan-name="LARP">
+      <div class="plan-name">LARP</div>
+      <div class="plan-price">₹2,000 / yr</div>
+      <div class="plan-arrow">→</div>
+      <div class="plan-detail">
+        <p class="plan-detail-body">The essentials. A membership number, a digital license, and full standing in the community of professional pretenders.</p>
+        <a href="account.html?mode=register&plan=LARP" class="btn-small" data-carry-session>Join Now — Free</a>
+      </div>
+    </div>
+    <div class="plan" data-tier="LARP+" data-plan-name="LARP+">
+      <div class="plan-name">LARP+</div>
+      <div class="plan-price">₹5,000 / yr</div>
+      <div class="plan-arrow">→</div>
+      <div class="plan-detail">
+        <p class="plan-detail-body">Everything in LARP, plus priority license production and access to members-only manifesto drops.</p>
+        <a href="account.html?mode=register&plan=LARP%2B" class="btn-small" data-carry-session>Join Now — Free</a>
+      </div>
+    </div>
+    <div class="plan" data-tier="LARP BLACK" data-plan-name="LARP BLACK">
+      <div class="plan-name">LARP Black</div>
+      <div class="plan-price">₹10,000 / yr</div>
+      <div class="plan-arrow">→</div>
+      <div class="plan-detail">
+        <p class="plan-detail-body">The top tier. Everything above, plus a physical CR80 card mailed to your door. Maximum commitment to the bit.</p>
+        <a href="account.html?mode=register&plan=LARP%20BLACK" class="btn-small" data-carry-session>Join Now — Free</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:clamp(40px,6vw,60px) 0;" class="center-col">
+    <p class="page-eyebrow">Already a member?</p>
+    <a href="account.html" class="btn-ghost-text" data-carry-session data-account-link>Sign in to your account →</a>
+  </section>
+</main>
+
+<footer class="site-footer wrap">
+  <div class="footer-row">
+    <div class="footer-word">LARP™</div>
+    <div class="footer-links">
+      <a href="index.html" data-carry-session>Home</a>
+      <a href="manifesto.html" data-carry-session>Manifesto</a>
+      <a href="license.html" data-carry-session>License</a>
+      <a href="account.html" data-carry-session>Account</a>
+    </div>
+  </div>
+  <div class="footer-meta" style="margin-top:20px;">© LARP™ — License to LARP. All pretending reserved.</div>
+</footer>
+
+<script src="app.js"></script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react" src="StaggeredMenu.jsx"></script>
+<script type="text/babel" data-presets="react" src="menu-mount.jsx"></script>
+<script>
+document.querySelectorAll('.plan').forEach(plan=>{
+  plan.addEventListener('click', (e)=>{
+    if(e.target.closest('a')) return;
+    const wasActive = plan.classList.contains('is-active');
+    document.querySelectorAll('.plan').forEach(p=>p.classList.remove('is-active'));
+    if(!wasActive) plan.classList.add('is-active');
+  });
+});
+</script>
+</body>
+</html>

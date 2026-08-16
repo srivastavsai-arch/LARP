@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>LARP™ — License to LARP</title>
+<meta name="description" content="The world's most exclusive membership for professional pretenders.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="StaggeredMenu.css">
+<style>
+/* ============ HERO ============ */
+.hero{
+  min-height:100svh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding-top:var(--nav-h);position:relative;
+}
+.hero-eyebrow{
+  font-family:var(--font-mono);font-size:clamp(11px,1.4vw,13px);letter-spacing:.18em;text-transform:uppercase;
+  opacity:.55;margin-bottom:clamp(18px,3.4vw,30px);
+  animation-delay:.05s;
+}
+.hero-word{
+  font-family:var(--font-display);
+  font-size:clamp(84px,26vw,340px);
+  line-height:.86;letter-spacing:-.01em;text-transform:uppercase;
+  animation-delay:.2s;
+}
+.hero-tagline{
+  font-family:var(--font-mono);font-size:clamp(12px,1.6vw,15px);letter-spacing:.08em;text-transform:uppercase;
+  max-width:480px;margin-top:clamp(20px,3.4vw,30px);opacity:.65;
+  animation-delay:.5s;
+}
+.hero-join{margin-top:clamp(30px,5vw,46px);animation-delay:.68s;}
+.hero-line-wrap{
+  position:absolute;bottom:clamp(26px,4.5vw,46px);left:50%;transform:translateX(-50%);
+  animation-delay:.9s;
+}
+.hero-line{
+  width:1px;height:44px;background:var(--black);opacity:.3;
+  position:relative;overflow:hidden;
+}
+.hero-line::after{
+  content:'';position:absolute;top:-100%;left:0;width:100%;height:100%;background:var(--black);
+  animation:lineTravel 2.2s ease-in-out infinite;
+}
+@keyframes lineTravel{
+  0%{top:-100%;} 50%{top:0%;} 100%{top:100%;}
+}
+@media (prefers-reduced-motion: reduce){
+  .hero-line::after{animation:none;top:0;}
+}
+@media (max-width:520px){
+  .hero-word{font-size:22vw;}
+}
+
+/* ============ SCROLLABLE SECTIONS ============ */
+.section-block{padding-top:clamp(80px,11vw,150px);scroll-margin-top:20px;}
+.section-head{padding:0 0 clamp(36px,6vw,64px);}
+.section-head .page-sub{max-width:520px;}
+
+/* ---- manifesto: cinematic pinned sequence ---- */
+.manifesto{position:relative;background:var(--white);overflow:hidden;scroll-margin-top:0;}
+.manifesto-pin{position:relative;height:100svh;min-height:520px;overflow:hidden;background:var(--white);}
+.manifesto-safe{
+  position:absolute;inset:0;z-index:2;
+  padding:calc(var(--nav-h) + clamp(16px,3vw,36px)) var(--gutter) clamp(22px,4vw,44px);
+  display:flex;flex-direction:column;
+}
+.manifesto-top{display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;opacity:.55;}
+.manifesto-top .dot{width:7px;height:7px;margin:0 10px;vertical-align:1px;}
+.manifesto-stage{position:relative;flex:1;min-height:0;}
+.manifesto-statements{position:absolute;inset:0;}
+.manifesto-bottom{display:flex;align-items:flex-end;gap:clamp(16px,3vw,36px);}
+.manifesto-counter{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;white-space:nowrap;}
+.manifesto-counter-val{font-size:clamp(18px,3vw,26px);}
+.manifesto-progress{flex:1;height:1px;background:rgba(0,0,0,.14);position:relative;}
+.manifesto-progress-fill{position:absolute;left:0;top:0;bottom:0;width:100%;background:var(--black);transform:scaleX(0);transform-origin:left;}
+.manifesto-scrollhint{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;opacity:.45;white-space:nowrap;}
+
+.manifesto-deco{position:absolute;inset:0;z-index:1;pointer-events:none;}
+.m-circle{position:absolute;top:50%;left:50%;width:min(62vw,760px);aspect-ratio:1;border:1px solid var(--line-strong);border-radius:50%;transform:translate(-50%,-50%);}
+.m-circle--small{width:min(34vw,420px);border-color:rgba(0,0,0,.1);}
+.m-ghost-word{position:absolute;left:0;right:0;top:50%;text-align:center;transform:translateY(-50%);
+  font-family:var(--font-display);font-size:clamp(120px,30vw,420px);line-height:1;text-transform:uppercase;
+  color:var(--black);opacity:.035;pointer-events:none;white-space:nowrap;}
+.m-corner{position:absolute;width:clamp(24px,4vw,44px);height:clamp(24px,4vw,44px);border:1px solid var(--black);}
+.m-corner--tl{top:clamp(20px,3vw,40px);left:clamp(20px,3vw,40px);border-right:0;border-bottom:0;}
+.m-corner--br{bottom:clamp(20px,3vw,40px);right:clamp(20px,3vw,40px);border-left:0;border-top:0;}
+
+.m-statement{position:absolute;top:50%;transform:translateY(-50%);max-width:100%;opacity:0;}
+.m-statement.m-align-left{left:0;text-align:left;}
+.m-statement.m-align-right{right:0;text-align:right;}
+.m-statement.m-align-center{left:0;right:0;text-align:center;}
+.m-inner{position:relative;will-change:transform,clip-path;}
+.m-ghost{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:var(--font-display);font-size:clamp(120px,28vw,400px);line-height:1;
+  color:var(--black);opacity:.04;pointer-events:none;user-select:none;white-space:nowrap;z-index:-1;}
+.m-row{display:flex;align-items:center;gap:14px;margin-bottom:clamp(14px,2.5vw,26px);}
+.m-align-right .m-row{justify-content:flex-end;}
+.m-align-center .m-row{justify-content:center;}
+.m-num{font-family:var(--font-mono);font-size:clamp(12px,1.6vw,15px);letter-spacing:.12em;}
+.m-dot{width:9px;height:9px;border-radius:50%;background:var(--black);flex:0 0 9px;}
+.m-line{width:clamp(44px,8vw,110px);height:1px;background:var(--black);transform-origin:left;}
+.m-align-right .m-line{transform-origin:right;}
+.m-align-center .m-line{transform-origin:center;}
+.m-text{
+  font-family:var(--font-display);
+  font-size:clamp(28px,8vw,150px);
+  line-height:.9;text-transform:uppercase;letter-spacing:-.01em;
+  text-wrap:balance;
+}
+.m-st-4 .m-text{font-size:clamp(26px,7.2vw,138px);}
+.m-st-5 .m-text{font-size:clamp(28px,8.6vw,172px);}
+.m-st-6 .m-text{font-size:clamp(44px,13vw,220px);}
+
+@media (prefers-reduced-motion: reduce){
+  .manifesto-pin{height:auto;min-height:0;}
+  .manifesto-stage{height:auto;}
+  .manifesto-statements{position:static;}
+  .m-statement{position:static;transform:none;opacity:1;margin:clamp(48px,9vh,96px) 0;max-width:100%;}
+  .m-inner{clip-path:none !important;transform:none !important;}
+  .m-text{letter-spacing:normal !important;}
+  .m-num,.m-dot,.m-line{opacity:1 !important;transform:none !important;}
+  .m-ghost,.m-circle,.m-ghost-word{display:none;}
+  .manifesto-scrollhint{display:none;}
+}
+.why-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,4vw,40px);
+  padding:clamp(40px,6vw,64px) 0;
+}
+.why-item-num{font-family:var(--font-mono);font-size:11px;opacity:.45;margin-bottom:10px;}
+.why-item-title{font-family:var(--font-display);font-size:clamp(18px,2.2vw,24px);text-transform:uppercase;margin-bottom:10px;}
+.why-item-body{font-size:14.5px;opacity:.7;max-width:32ch;}
+@media (max-width:820px){
+  .why-grid{grid-template-columns:1fr;}
+}
+
+/* ---- membership ---- */
+.plans{display:flex;flex-direction:column;}
+.plan{
+  border-top:1px solid var(--line);
+  padding:clamp(28px,4.5vw,44px) 0;
+  display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:18px;
+  cursor:pointer;transition:padding .35s var(--ease);
+}
+.plan:last-child{border-bottom:1px solid var(--line);}
+.plan-name{font-family:var(--font-display);font-size:clamp(28px,5vw,52px);text-transform:uppercase;transition:font-size .35s var(--ease);}
+.plan-price{font-family:var(--font-mono);font-size:clamp(15px,2vw,20px);letter-spacing:.04em;opacity:.7;text-align:right;white-space:nowrap;}
+.plan-detail{
+  grid-column:1/-1;max-height:0;overflow:hidden;opacity:0;
+  transition:max-height .4s var(--ease),opacity .3s var(--ease),margin-top .4s var(--ease);
+}
+.plan.is-active .plan-detail{max-height:200px;opacity:1;margin-top:18px;}
+.plan.is-active .plan-name{font-size:clamp(34px,6.4vw,72px);}
+.plan-detail-body{font-size:14.5px;opacity:.7;max-width:44ch;margin-bottom:16px;}
+.plan-arrow{font-family:var(--font-mono);font-size:13px;transition:transform .35s var(--ease);}
+.plan.is-active .plan-arrow{transform:rotate(90deg);}
+
+/* keep the black logo legible against the white menu panel */
+.staggered-menu-wrapper[data-open] .sm-logo-img{filter:none !important;}
+</style>
+</head>
+<body>
+
+<div id="menu-root" aria-label="Main navigation"></div>
+
+<main>
+  <section class="hero" id="home">
+    <div class="hero-eyebrow reveal">License to LARP</div>
+    <h1 class="hero-word reveal">LARP</h1>
+    <p class="hero-tagline reveal">Everyone is pretending. We just made it official.</p>
+    <a href="account.html?mode=register" class="btn-small hero-join reveal" data-carry-session>
+      Join Now — Free
+    </a>
+    <div class="hero-line-wrap reveal"><div class="hero-line"></div></div>
+  </section>
+
+  <section class="manifesto" id="manifesto" aria-label="Manifesto">
+    <div class="manifesto-pin">
+      <div class="manifesto-safe">
+        <div class="manifesto-top">
+          <div>Manifesto <span class="dot"></span> Six statements</div>
+          <div>M / 06</div>
+        </div>
+
+        <div class="manifesto-stage">
+          <div class="manifesto-deco" aria-hidden="true">
+            <span class="m-circle"></span>
+            <span class="m-circle m-circle--small"></span>
+            <span class="m-corner m-corner--tl"></span>
+            <span class="m-corner m-corner--br"></span>
+            <span class="m-ghost-word">LARP</span>
+          </div>
+
+          <div class="manifesto-statements">
+            <div class="m-statement m-align-left m-st-1" data-n="01">
+              <div class="m-ghost" aria-hidden="true">01</div>
+              <div class="m-inner">
+                <div class="m-row"><span class="m-num">01</span><span class="m-dot"></span><span class="m-line"></span></div>
+                <h2 class="m-text">Everyone is<br>pretending.</h2>
+              </div>
+            </div>
+            <div class="m-statement m-align-right m-st-2" data-n="02">
+              <div class="m-ghost" aria-hidden="true">02</div>
+              <div class="m-inner">
+                <div class="m-row"><span class="m-num">02</span><span class="m-dot"></span><span class="m-line"></span></div>
+                <h2 class="m-text">We just made<br>it official.</h2>
+              </div>
+            </div>
+            <div class="m-statement m-align-left m-st-3" data-n="03">
+              <div class="m-ghost" aria-hidden="true">03</div>
+              <div class="m-inner">
+                <div class="m-row"><span class="m-num">03</span><span class="m-dot"></span><span class="m-line"></span></div>
+                <h2 class="m-text">Status can be<br>engineered.</h2>
+              </div>
+            </div>
+            <div class="m-statement m-align-right m-st-4" data-n="04">
+              <div class="m-ghost" aria-hidden="true">04</div>
+              <div class="m-inner">
+                <div class="m-row"><span class="m-num">04</span><span class="m-dot"></span><span class="m-line"></span></div>
+                <h2 class="m-text">Authenticity<br>is optional.</h2>
+              </div>
+            </div>
+            <div class="m-statement m-align-left m-st-5" data-n="05">
+              <div class="m-ghost" aria-hidden="true">05</div>
+              <div class="m-inner">
+                <div class="m-row"><span class="m-num">05</span><span class="m-dot"></span><span class="m-line"></span></div>
+                <h2 class="m-text">Look the part.<br>Act the part.</h2>
+              </div>
+            </div>
+            <div class="m-statement m-align-center m-st-6" data-n="06">
+              <div class="m-ghost" aria-hidden="true">06</div>
+              <div class="m-inner">
+                <div class="m-row"><span class="m-num">06</span><span class="m-dot"></span><span class="m-line"></span></div>
+                <h2 class="m-text">LARP<br>the part.</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="manifesto-bottom">
+          <div class="manifesto-counter"><span class="manifesto-counter-val">01</span> / 06</div>
+          <div class="manifesto-progress"><span class="manifesto-progress-fill"></span></div>
+          <div class="manifesto-scrollhint">Scroll to recite</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section-block manifesto-outro">
+    <header class="page-head section-head">
+      <div class="page-eyebrow">Why</div>
+      <h2 class="page-title">Why it<br>works.</h2>
+      <p class="page-sub">The product is ridiculous. The execution isn't. That tension is the point.</p>
+    </header>
+
+    <div class="why-grid">
+      <div>
+        <div class="why-item-num">Why — 01</div>
+        <div class="why-item-title">It's honest</div>
+        <div class="why-item-body">Everyone curates a version of themselves. LARP just puts a name — and a laminate — on it.</div>
+      </div>
+      <div>
+        <div class="why-item-num">Why — 02</div>
+        <div class="why-item-title">It's a membership</div>
+        <div class="why-item-body">A real card, a real number, a real community of people committed to the bit.</div>
+      </div>
+      <div>
+        <div class="why-item-num">Why — 03</div>
+        <div class="why-item-title">It's the joke, seriously</div>
+        <div class="why-item-body">The product is ridiculous. The execution isn't. That tension is the point.</div>
+      </div>
+    </div>
+
+    <div class="center-col" style="padding:clamp(20px,4vw,40px) 0 clamp(40px,6vw,64px);">
+      <a href="account.html?mode=register" class="btn-solid btn" data-carry-session>Become a member</a>
+    </div>
+  </section>
+
+  <section class="wrap section-block" id="membership" aria-label="Membership">
+    <header class="page-head section-head">
+      <div class="page-eyebrow">Membership</div>
+      <h2 class="page-title">Pick your<br>level of<br>commitment.</h2>
+      <p class="page-sub">Three tiers. One bit. Tap a plan to see what it gets you.</p>
+    </header>
+
+    <div class="plans" id="plans">
+      <div class="plan" data-tier="LARP" data-plan-name="LARP">
+        <div class="plan-name">LARP</div>
+        <div class="plan-price">₹2,000 / yr</div>
+        <div class="plan-arrow">→</div>
+        <div class="plan-detail">
+          <p class="plan-detail-body">The essentials. A membership number, a digital license, and full standing in the community of professional pretenders.</p>
+          <a href="account.html?mode=register&plan=LARP" class="btn-small" data-carry-session>Join Now — Free</a>
+        </div>
+      </div>
+      <div class="plan" data-tier="LARP+" data-plan-name="LARP+">
+        <div class="plan-name">LARP+</div>
+        <div class="plan-price">₹5,000 / yr</div>
+        <div class="plan-arrow">→</div>
+        <div class="plan-detail">
+          <p class="plan-detail-body">Everything in LARP, plus priority license production and access to members-only manifesto drops.</p>
+          <a href="account.html?mode=register&plan=LARP%2B" class="btn-small" data-carry-session>Join Now — Free</a>
+        </div>
+      </div>
+      <div class="plan" data-tier="LARP BLACK" data-plan-name="LARP BLACK">
+        <div class="plan-name">LARP Black</div>
+        <div class="plan-price">₹10,000 / yr</div>
+        <div class="plan-arrow">→</div>
+        <div class="plan-detail">
+          <p class="plan-detail-body">The top tier. Everything above, plus a physical CR80 card mailed to your door. Maximum commitment to the bit.</p>
+          <a href="account.html?mode=register&plan=LARP%20BLACK" class="btn-small" data-carry-session>Join Now — Free</a>
+        </div>
+      </div>
+    </div>
+
+    <section style="padding:clamp(40px,6vw,60px) 0;" class="center-col">
+      <p class="page-eyebrow">Already a member?</p>
+      <a href="account.html" class="btn-ghost-text" data-carry-session data-account-link>Sign in to your account →</a>
+    </section>
+  </section>
+</main>
+
+<footer class="site-footer wrap">
+  <div class="footer-row">
+    <div class="footer-word">LARP™</div>
+    <div class="footer-links">
+      <a href="#manifesto" data-carry-session>Manifesto</a>
+      <a href="#membership" data-carry-session>Membership</a>
+      <a href="license.html" data-carry-session>License</a>
+      <a href="account.html" data-carry-session data-account-link>Account</a>
+    </div>
+  </div>
+  <div class="footer-meta" style="margin-top:20px;">© LARP™ — License to LARP. All pretending reserved.</div>
+</footer>
+
+<script src="app.js"></script>
+
+<!-- React (UMD) + GSAP + Babel standalone: no build step needed -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+
+<!-- StaggeredMenu component (transformed by Babel) -->
+<script type="text/babel" data-presets="react" src="StaggeredMenu.jsx"></script>
+
+<!-- Mount the StaggeredMenu with site navigation + auth area -->
+<script type="text/babel" data-presets="react" src="menu-mount.jsx"></script>
+
+<script>
+document.querySelectorAll('.plan').forEach(plan=>{
+  plan.addEventListener('click', (e)=>{
+    if(e.target.closest('a')) return;
+    const wasActive = plan.classList.contains('is-active');
+    document.querySelectorAll('.plan').forEach(p=>p.classList.remove('is-active'));
+    if(!wasActive) plan.classList.add('is-active');
+  });
+});
+</script>
+
+<script>
+(function(){
+  if(!window.gsap || !window.ScrollTrigger) return;
+  gsap.registerPlugin(ScrollTrigger);
+
+  var section = document.querySelector('.manifesto');
+  if(!section) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var statements = gsap.utils.toArray('.m-statement');
+  if(!statements.length) return;
+
+  var counterVal = section.querySelector('.manifesto-counter-val');
+  var fill       = section.querySelector('.manifesto-progress-fill');
+  var circle     = section.querySelector('.m-circle');
+  var circleSm   = section.querySelector('.m-circle--small');
+  var ghostWord  = section.querySelector('.m-ghost-word');
+
+  var CONFIG = [
+    { clip:['inset(0 0 100% 0)','inset(0 0 0% 0)'], scale:[1.5,1], x:[-4,0],   tracking:['0.16em','-0.01em'], dur:3.2,
+      out:{ dur:.9, clip:'inset(0 0 0 100%)', scale:.94, x:6 } },
+    { clip:['inset(0 0 0 100%)','inset(0 0 0 0%)'], x:[90,0],  scale:[1.35,1], tracking:['0.2em','-0.01em'], dur:3.2,
+      out:{ dur:.9, clip:'inset(100% 0 0 0)', y:26, scale:.96 } },
+    { clip:['inset(100% 0 0 0)','inset(0 0 0 0)'], y:[110,0],  scale:[.9,1],   tracking:['0.14em','-0.01em'], dur:3.2,
+      out:{ dur:.9, clip:'inset(0 100% 0 0)', x:-40, scale:.94 } },
+    { clip:['inset(16% 14% 16% 14%)','inset(0 0 0 0)'], scale:[1.6,1], tracking:['0.2em','-0.01em'], dur:3.4,
+      out:{ dur:.9, clip:'inset(0 0 100% 0)', scale:.95 } },
+    { clip:['inset(0 100% 0 0)','inset(0 0 0 0)'], x:[-110,0], scale:[1.7,1], tracking:['0.24em','-0.02em'], dur:3.4,
+      out:{ dur:.9, clip:'inset(0 0 0 100%)', scale:.92, x:20 } },
+    { clip:['inset(100% 0 0 0)','inset(0 0 0 0)'], scale:[1.3,1], tracking:['0.3em','-0.01em'], dur:4.2, out:null }
+  ];
+
+  var W = 4.4, OV = 0.9, t = 0;
+
+  var tl = gsap.timeline({
+    scrollTrigger:{
+      trigger:section,
+      start:'top top',
+      end:'+=3400',
+      scrub:1.1,
+      pin:true,
+      anticipatePin:1,
+      onUpdate:function(self){
+        var idx = Math.min(6, Math.floor(self.progress*6)+1);
+        if(counterVal) counterVal.textContent = ('0'+idx).slice(-2);
+      }
+    }
+  });
+
+  statements.forEach(function(st, i){
+    var cfg = CONFIG[i];
+    var inner = st.querySelector('.m-inner');
+    var text  = st.querySelector('.m-text');
+    var num   = st.querySelector('.m-num');
+    var dot   = st.querySelector('.m-dot');
+    var line  = st.querySelector('.m-line');
+    var ghost = st.querySelector('.m-ghost');
+    var EASE  = 'power1.inOut';
+
+    tl.to(st, { opacity:1, duration:cfg.dur*0.35, ease:'none' }, t);
+    tl.fromTo(inner, { clipPath:cfg.clip[0], scale:cfg.scale[0] },
+      { clipPath:cfg.clip[1], scale:cfg.scale[1], duration:cfg.dur, ease:EASE }, t);
+    if(cfg.x) tl.fromTo(inner, { x:cfg.x[0] }, { x:cfg.x[1], duration:cfg.dur, ease:EASE }, t);
+    if(cfg.y) tl.fromTo(inner, { y:cfg.y[0] }, { y:cfg.y[1], duration:cfg.dur, ease:EASE }, t);
+    if(cfg.tracking) tl.fromTo(text, { letterSpacing:cfg.tracking[0] }, { letterSpacing:cfg.tracking[1], duration:cfg.dur, ease:EASE }, t);
+
+    tl.fromTo(num,  { opacity:0, x:(i%2?14:-14) }, { opacity:1, x:0, duration:1.1, ease:'power2.out' }, t+1.0);
+    tl.fromTo(dot,  { scale:0 }, { scale:1, duration:.9, ease:'power3.out' }, t+1.4);
+    tl.fromTo(line, { scaleX:0 }, { scaleX:1, duration:1.5, ease:'power3.inOut' }, t+1.3);
+
+    if(ghost) tl.fromTo(ghost, { xPercent:(i%2?8:-8), opacity:.06 }, { xPercent:0, opacity:.04, duration:cfg.dur, ease:'none' }, t);
+
+    if(cfg.out){
+      var o = cfg.out, start = t + cfg.dur + 0.6;
+      tl.to(st, { opacity:0, duration:o.dur, ease:'none' }, start);
+      tl.to(inner, { clipPath:o.clip, scale:o.scale, duration:o.dur, ease:'power1.in' }, start);
+      if(o.x) tl.to(inner, { x:o.x, duration:o.dur, ease:'power1.in' }, start);
+      if(o.y) tl.to(inner, { y:o.y, duration:o.dur, ease:'power1.in' }, start);
+    }
+
+    t += W - OV;
+  });
+
+  var total = t + 4.2;
+  tl.to(fill,      { scaleX:1, duration:total, ease:'none' }, 0);
+  tl.fromTo(circle,   { rotate:0,   scale:1.1 }, { rotate:-120, scale:1,   duration:total, ease:'none' }, 0);
+  tl.fromTo(circleSm, { rotate:0,   scale:.9  }, { rotate:160,  scale:1,   duration:total, ease:'none' }, 0);
+  tl.fromTo(ghostWord,{ xPercent:-8, opacity:.02 }, { xPercent:6, opacity:.04, duration:total, ease:'none' }, 0);
+})();
+</script>
+</body>
+</html>

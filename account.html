@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Account — LARP™</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="StaggeredMenu.css">
+<style>
+:root{
+  --accent:#5227FF;
+}
+.acct-stage{
+  min-height:100svh;
+  position:relative;
+  padding:calc(var(--nav-h) + clamp(20px,4vw,44px)) var(--gutter) clamp(60px,9vw,120px);
+}
+.acct-wrap{width:100%;padding-inline:var(--gutter);}
+
+/* editorial frame */
+.acct-micro{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  display:flex;align-items:center;gap:12px;opacity:.6;
+  margin-bottom:clamp(26px,5vw,48px);
+}
+.acct-micro .dot{width:7px;height:7px;border-radius:50%;background:var(--black);flex:0 0 7px;}
+.acct-micro .acct-micro-page{margin-left:auto;letter-spacing:.12em;}
+.acct-display{
+  font-family:var(--font-display);
+  font-size:clamp(38px,10.5vw,148px);
+  line-height:.9;text-transform:uppercase;letter-spacing:-.01em;
+}
+.acct-index{
+  position:absolute;right:var(--gutter);top:calc(var(--nav-h) + clamp(20px,4vw,44px));
+  font-family:var(--font-mono);font-size:clamp(80px,16vw,240px);line-height:1;color:var(--black);
+  opacity:.055;user-select:none;pointer-events:none;
+  transition:transform .7s var(--ease);
+  z-index:0;
+}
+.acct-view.is-active:hover .acct-index{transform:translateX(-12px);}
+
+/* view transitions */
+.acct-view{display:none;}
+.acct-view.is-active{display:block;position:relative;z-index:1;animation:viewIn .75s var(--ease) both;}
+@keyframes viewIn{from{opacity:0;transform:translateY(26px);}to{opacity:1;transform:none;}}
+.acct-stage.is-switching .acct-view.is-active{animation:viewOut .28s var(--ease) both;}
+@keyframes viewOut{to{opacity:0;transform:translateY(-18px);}}
+
+/* landing choices */
+.choice-list{margin-top:clamp(30px,5vw,60px);display:flex;flex-direction:column;}
+.choice{
+  position:relative;
+  display:flex;align-items:center;gap:clamp(16px,3vw,28px);
+  padding:clamp(24px,4vw,40px) clamp(6px,1vw,14px);
+  border-top:1px solid var(--line-strong);
+  color:inherit;text-decoration:none;
+  transition:background .4s var(--ease);
+  overflow:hidden;
+}
+.choice:last-child{border-bottom:1px solid var(--line-strong);}
+.choice-num{font-family:var(--font-mono);font-size:12px;letter-spacing:.1em;opacity:.45;min-width:2.4em;}
+.choice-dot{width:8px;height:8px;border-radius:50%;background:var(--black);flex:0 0 8px;transition:transform .4s var(--ease),background .3s;}
+.choice-name{
+  font-family:var(--font-display);font-size:clamp(30px,7vw,68px);text-transform:uppercase;letter-spacing:-.01em;line-height:1;
+  transition:transform .45s var(--ease),color .4s var(--ease);
+}
+.choice-arrow{margin-left:auto;font-size:clamp(18px,3vw,30px);transition:transform .45s var(--ease);}
+.choice-line{position:absolute;left:0;bottom:-1px;width:100%;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease);}
+.choice-sub{
+  position:absolute;right:clamp(20px,4vw,40px);top:50%;transform:translateY(-50%) translateX(12px);
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;opacity:0;
+  max-width:22ch;text-align:right;transition:opacity .4s var(--ease),transform .4s var(--ease);
+}
+.choice:hover{background:rgba(0,0,0,.022);}
+.choice:hover .choice-name{transform:translateX(14px);color:var(--accent);}
+.choice:hover .choice-dot{transform:scale(1.7);background:var(--accent);}
+.choice:hover .choice-arrow{transform:translateX(10px);}
+.choice:hover .choice-line{transform:scaleX(1);}
+.choice:hover .choice-sub{opacity:.5;transform:translateY(-50%) translateX(0);}
+@media (max-width:640px){.choice-sub{display:none;}}
+
+/* editorial forms */
+.acct-form{max-width:580px;margin-top:clamp(28px,5vw,52px);}
+.acct-field{margin-bottom:clamp(28px,4.5vw,44px);}
+.field-label{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  display:flex;align-items:center;gap:10px;opacity:.55;margin-bottom:12px;
+}
+.field-label .dot{width:6px;height:6px;border-radius:50%;background:var(--black);}
+.field-input{
+  width:100%;border:none;border-bottom:1.5px solid var(--black);
+  padding:14px 2px;font-family:var(--font-display);font-size:clamp(24px,4.5vw,38px);
+  background:transparent;color:var(--black);letter-spacing:0;text-transform:none;
+  transition:padding .3s var(--ease),border-color .3s;
+}
+.field-input:focus{outline:none;padding-bottom:13px;border-bottom-color:var(--accent);}
+.field-input::placeholder{color:rgba(0,0,0,.25);}
+.field-input:disabled{opacity:.4;}
+.field-note{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.5;margin-top:clamp(20px,3vw,30px);display:block;}
+.field-note strong{font-weight:500;}
+.field-error{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.05em;margin-top:16px;padding:12px 0;border-top:1px solid var(--line);display:block;}
+
+.acct-submit{
+  display:inline-flex;align-items:center;gap:14px;margin-top:clamp(20px,3.5vw,32px);
+  font-family:var(--font-display);font-size:clamp(26px,5vw,44px);text-transform:uppercase;letter-spacing:-.01em;
+  border:none;border-bottom:2px solid var(--black);background:none;color:inherit;cursor:pointer;padding:6px 2px;
+  transition:gap .35s var(--ease),border-color .3s,color .3s;
+}
+.acct-submit:hover{gap:22px;color:var(--accent);border-color:var(--accent);}
+
+.acct-back{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  display:inline-flex;align-items:center;gap:8px;opacity:.55;margin-bottom:clamp(26px,4vw,40px);
+  transition:opacity .3s,transform .3s var(--ease);
+}
+.acct-back:hover{opacity:1;transform:translateX(-4px);}
+
+/* welcome */
+.welcome-memno{
+  font-family:var(--font-mono);
+  font-size:clamp(34px,8vw,88px);
+  letter-spacing:.02em;line-height:1;
+  display:inline-block;margin:clamp(22px,4vw,40px) 0 clamp(10px,2vw,16px);
+  animation:memnoPop 1.1s var(--ease) both;
+}
+.welcome-sub{font-family:var(--font-display);font-size:clamp(22px,4vw,40px);text-transform:uppercase;letter-spacing:-.01em;max-width:14ch;line-height:1.05;opacity:.85;margin-bottom:clamp(28px,5vw,44px);}
+
+/* credential */
+.credential{max-width:660px;margin-top:clamp(24px,4vw,40px);}
+.credential-memno{
+  font-family:var(--font-mono);
+  font-size:clamp(24px,4.5vw,40px);
+  letter-spacing:.04em;
+  border:1.5px solid var(--black);border-radius:999px;
+  padding:clamp(12px,2vw,16px) clamp(22px,3.5vw,32px);
+  display:inline-block;margin-bottom:clamp(28px,5vw,44px);
+  animation:memnoPop 1s var(--ease) both;
+}
+@keyframes memnoPop{
+  from{opacity:0;transform:translateY(16px) scale(.96);letter-spacing:.35em;}
+  to{opacity:1;transform:none;letter-spacing:inherit;}
+}
+.credential-name{font-family:var(--font-display);font-size:clamp(30px,6.5vw,72px);text-transform:uppercase;letter-spacing:-.01em;line-height:.95;word-break:break-word;margin-bottom:clamp(22px,3.5vw,36px);animation:viewIn .7s var(--ease) both;}
+.credential-row{
+  display:flex;justify-content:space-between;align-items:baseline;gap:18px;
+  padding:clamp(17px,2.6vw,24px) 0;border-top:1px solid var(--line-strong);
+}
+.credential-row:last-of-type{border-bottom:1px solid var(--line-strong);}
+.credential-row .cred-key{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.5;flex:0 0 auto;}
+.credential-row .cred-val{font-family:var(--font-display);font-size:clamp(19px,3.2vw,30px);text-transform:uppercase;letter-spacing:-.01em;text-align:right;word-break:break-word;}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--black);display:inline-block;margin-right:9px;animation:pulse 2.2s var(--ease) infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.45);}}
+
+/* actions */
+.acct-actions{display:flex;flex-direction:column;max-width:660px;margin-top:clamp(38px,6vw,64px);}
+.action{
+  display:flex;align-items:center;gap:14px;position:relative;
+  padding:clamp(20px,3vw,28px) clamp(6px,1vw,14px);border-top:1px solid var(--line-strong);
+  font-family:var(--font-display);font-size:clamp(20px,3.4vw,32px);text-transform:uppercase;letter-spacing:-.01em;
+  text-decoration:none;color:inherit;
+  transition:padding-left .35s var(--ease),color .3s;
+}
+.action:last-child{border-bottom:1px solid var(--line-strong);}
+.action .action-dot{width:8px;height:8px;border-radius:50%;background:var(--black);flex:0 0 8px;transition:transform .35s var(--ease),background .3s;}
+.action .arrow{margin-left:auto;font-size:.8em;transition:transform .35s var(--ease);}
+.action:hover{padding-left:20px;color:var(--accent);}
+.action:hover .action-dot{transform:scale(1.6);background:var(--accent);}
+.action:hover .arrow{transform:translateX(8px);}
+.action.is-primary{
+  display:inline-flex;align-self:flex-start;gap:16px;
+  background:var(--black);color:var(--white);
+  border-radius:999px;padding:clamp(16px,2.4vw,22px) clamp(26px,4vw,38px);
+  border-top:none;border-bottom:none;
+  margin-bottom:clamp(8px,1.5vw,14px);
+  transition:gap .35s var(--ease),transform .35s var(--ease),background .3s;
+}
+.action.is-primary:hover{padding-left:clamp(26px,4vw,38px);gap:24px;transform:translateY(-2px);background:#151515;color:var(--white);}
+.action.is-primary .action-dot{background:var(--white);}
+.action.is-primary:hover .action-dot{background:var(--accent);}
+
+/* toast */
+.acct-toast{
+  position:fixed;left:50%;bottom:clamp(24px,5vw,48px);
+  transform:translateX(-50%) translateY(22px);
+  background:var(--black);color:var(--white);
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  padding:15px 28px;border-radius:999px;
+  opacity:0;pointer-events:none;z-index:900;
+  transition:opacity .4s var(--ease),transform .4s var(--ease);
+}
+.acct-toast.is-on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media (max-width:640px){
+  .acct-index{font-size:40vw;}
+}
+</style>
+</head>
+<body>
+
+<div id="menu-root" aria-label="Main navigation"></div>
+<div class="acct-toast" id="acctToast" role="status"></div>
+
+<main class="wrap acct-stage">
+
+  <!-- LANDING: ACCOUNT -->
+  <section class="acct-view is-active" id="view-landing">
+    <div class="acct-index">05</div>
+    <div class="acct-micro">
+      Member access <span class="dot"></span>
+      <span class="acct-micro-page">Index / 05</span>
+    </div>
+    <h1 class="acct-display">ACCOUNT</h1>
+    <div class="choice-list">
+      <a class="choice" href="#" data-goto="register">
+        <span class="choice-num">01</span>
+        <span class="choice-dot"></span>
+        <span class="choice-name">Register</span>
+        <span class="choice-arrow">→</span>
+        <span class="choice-line"></span>
+        <span class="choice-sub">New here. Get licensed — free, in about ten seconds.</span>
+      </a>
+      <a class="choice" href="#" data-goto="signin">
+        <span class="choice-num">02</span>
+        <span class="choice-dot"></span>
+        <span class="choice-name">Sign in</span>
+        <span class="choice-arrow">→</span>
+        <span class="choice-line"></span>
+        <span class="choice-sub">Already a member. Pick up right where you left off.</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- REGISTER -->
+  <section class="acct-view" id="view-register">
+    <div class="acct-index">03</div>
+    <a href="#" class="acct-back" data-goto="landing">← Account</a>
+    <div class="acct-micro">Become a member <span class="dot"></span> <span class="acct-micro-page">Step / 03</span></div>
+    <h1 class="acct-display">Become a<br>member.</h1>
+    <form class="acct-form" id="registerForm">
+      <div class="acct-field">
+        <label class="field-label" for="regName"><span class="dot"></span>Full name</label>
+        <input class="field-input" id="regName" name="name" type="text" placeholder="Your name" autocomplete="name" required>
+      </div>
+      <div class="acct-field">
+        <label class="field-label" for="regEmail"><span class="dot"></span>Email</label>
+        <input class="field-input" id="regEmail" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+      </div>
+      <button type="submit" class="acct-submit">
+        Continue
+        <span class="arrow">→</span>
+      </button>
+      <span class="field-note" id="regPlanNote"></span>
+      <span class="field-error" id="regError" style="display:none;"></span>
+    </form>
+  </section>
+
+  <!-- SIGN IN -->
+  <section class="acct-view" id="view-signin">
+    <div class="acct-index">04</div>
+    <a href="#" class="acct-back" data-goto="landing">← Account</a>
+    <div class="acct-micro">Welcome back <span class="dot"></span> <span class="acct-micro-page">Step / 04</span></div>
+    <h1 class="acct-display">Welcome<br>back.</h1>
+    <form class="acct-form" id="signinForm">
+      <div class="acct-field">
+        <label class="field-label" for="signEmail"><span class="dot"></span>Email</label>
+        <input class="field-input" id="signEmail" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+      </div>
+      <button type="submit" class="acct-submit">
+        Continue
+        <span class="arrow">→</span>
+      </button>
+      <span class="field-note">Try <strong>demo@larp.club</strong> to sign in to a sample account.</span>
+      <span class="field-error" id="signError" style="display:none;"></span>
+    </form>
+  </section>
+
+  <!-- MEMBER NOT FOUND -->
+  <section class="acct-view" id="view-notfound">
+    <div class="acct-index">05</div>
+    <a href="#" class="acct-back" data-goto="signin">← Sign in</a>
+    <div class="acct-micro">Sign in <span class="dot"></span> <span class="acct-micro-page">Error / 05</span></div>
+    <h1 class="acct-display">Member<br>not found.</h1>
+    <p class="page-sub" style="max-width:380px;margin-top:18px;">There's no LARP account under that email yet. You can register for free in seconds.</p>
+    <div style="margin-top:clamp(28px,5vw,44px);">
+      <a href="#" class="acct-submit" data-goto="register">Register for Free <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <!-- WELCOME (post-registration) -->
+  <section class="acct-view" id="view-welcome">
+    <div class="acct-index">02</div>
+    <div class="acct-micro">Welcome to LARP <span class="dot"></span> <span class="acct-micro-page">Issued / 02</span></div>
+    <h1 class="acct-display">MEMBER</h1>
+    <div class="welcome-memno" id="welcomeMemNo">LARP-000000</div>
+    <p class="welcome-sub">Welcome to LARP.<br>Your license is one step away.</p>
+    <div>
+      <a href="#" class="acct-submit" data-goto="mylarp">My LARP <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <!-- MY LARP -->
+  <section class="acct-view" id="view-mylarp">
+    <div class="acct-index">01</div>
+    <div class="acct-micro">Member <span class="dot"></span> <span class="acct-micro-page">Credential / 01</span></div>
+    <h1 class="acct-display">MY LARP</h1>
+    <div class="credential">
+      <div class="credential-memno" id="cardMemNoBig">LARP-000000</div>
+      <div class="credential-name" id="cardName">—</div>
+      <div class="credential-row"><span class="cred-key">Email</span><span class="cred-val" id="cardEmail">—</span></div>
+      <div class="credential-row"><span class="cred-key">Membership number</span><span class="cred-val" id="cardMemNo">—</span></div>
+      <div class="credential-row"><span class="cred-key">Membership</span><span class="cred-val" id="cardTier">—</span></div>
+      <div class="credential-row"><span class="cred-key">Status</span><span class="cred-val"><span class="status-dot"></span>Active</span></div>
+      <div class="credential-row"><span class="cred-key">Member since</span><span class="cred-val" id="cardSince">—</span></div>
+    </div>
+    <div class="acct-actions">
+      <a href="license.html" class="action is-primary" data-carry-session>
+        <span class="action-dot"></span>
+        <span class="action-label">Generate License</span>
+        <span class="arrow">→</span>
+      </a>
+      <a href="license.html" class="action" data-carry-session>
+        <span class="action-dot"></span>
+        <span class="action-label">View License</span>
+        <span class="arrow">→</span>
+      </a>
+      <a href="#" class="action" data-goto="edit">
+        <span class="action-dot"></span>
+        <span class="action-label">Edit Profile</span>
+        <span class="arrow">→</span>
+      </a>
+      <a href="index.html#membership" class="action" data-carry-session>
+        <span class="action-dot"></span>
+        <span class="action-label">Change Plan</span>
+        <span class="arrow">→</span>
+      </a>
+      <a href="#" class="action" id="signOutBtn">
+        <span class="action-dot"></span>
+        <span class="action-label">Sign Out</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- EDIT PROFILE -->
+  <section class="acct-view" id="view-edit">
+    <div class="acct-index">02</div>
+    <a href="#" class="acct-back" data-goto="mylarp">← My LARP</a>
+    <div class="acct-micro">Edit member <span class="dot"></span> <span class="acct-micro-page">Profile / 02</span></div>
+    <h1 class="acct-display">Edit<br>member.</h1>
+    <form class="acct-form" id="editForm">
+      <div class="acct-field">
+        <label class="field-label" for="editName"><span class="dot"></span>Name</label>
+        <input class="field-input" id="editName" name="name" type="text" autocomplete="name" required>
+      </div>
+      <div class="acct-field">
+        <label class="field-label" for="editEmail"><span class="dot"></span>Email</label>
+        <input class="field-input" id="editEmail" name="email" type="email" autocomplete="email" required>
+      </div>
+      <div class="acct-field">
+        <label class="field-label"><span class="dot"></span>Membership number (system-generated)</label>
+        <input class="field-input" id="editMemNo" type="text" disabled>
+      </div>
+      <button type="submit" class="acct-submit">
+        Save changes
+        <span class="arrow">→</span>
+      </button>
+    </form>
+  </section>
+
+</main>
+
+<script src="app.js"></script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react" src="StaggeredMenu.jsx"></script>
+<script type="text/babel" data-presets="react" src="menu-mount.jsx"></script>
+
+<script>
+const params = new URLSearchParams(location.search);
+let session = LarpSession.current();
+let pendingPlan = params.get('plan') || (session && session.t) || 'LARP';
+
+const toastEl = document.getElementById('acctToast');
+let toastTimer = null;
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('is-on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>toastEl.classList.remove('is-on'), 2000);
+}
+
+function show(id){
+  const el = document.getElementById('view-'+id);
+  if(!el) return;
+  if(el.classList.contains('is-active')){
+    window.scrollTo({top:0, behavior:'auto'});
+    return;
+  }
+  const stage = document.querySelector('.acct-stage');
+  stage.classList.add('is-switching');
+  setTimeout(()=>{
+    document.querySelectorAll('.acct-view').forEach(v=>v.classList.remove('is-active'));
+    el.classList.add('is-active');
+    stage.classList.remove('is-switching');
+    window.scrollTo({top:0, behavior:'auto'});
+  }, 280);
+}
+
+function pushSessionToUrl(){
+  const p = LarpSession.toParams(session);
+  const qs = p.toString();
+  history.replaceState(null, '', location.pathname + (qs ? '?'+qs : ''));
+  LarpSession.propagateToLinks();
+  if(window.LARPMenu) window.LARPMenu.render();
+}
+
+function fillCredential(){
+  document.getElementById('cardName').textContent = session.n;
+  document.getElementById('cardEmail').textContent = session.e;
+  document.getElementById('cardMemNo').textContent = session.m;
+  document.getElementById('cardMemNoBig').textContent = session.m;
+  document.getElementById('cardTier').textContent = session.t;
+  document.getElementById('cardSince').textContent = session.d;
+}
+
+/* ---- initial routing ---- */
+if(session){
+  fillCredential();
+  show('mylarp');
+} else {
+  const mode = params.get('mode');
+  if(mode === 'register'){
+    if(pendingPlan) document.getElementById('regPlanNote').textContent = 'Selected plan — ' + pendingPlan + ' / ₹' + planPrice(pendingPlan) + ' / yr';
+    show('register');
+  } else if(mode === 'signin'){
+    show('signin');
+  } else {
+    show('landing');
+  }
+}
+
+function planPrice(tier){
+  if(tier === 'LARP+') return '5,000';
+  if(tier === 'LARP BLACK') return '10,000';
+  return '2,000';
+}
+
+/* ---- nav between static views ---- */
+document.querySelectorAll('[data-goto]').forEach(el=>{
+  el.addEventListener('click', (e)=>{
+    e.preventDefault();
+    show(el.getAttribute('data-goto'));
+  });
+});
+
+/* ---- register ---- */
+document.getElementById('registerForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  if(!name || !email) return;
+  session = {
+    n:name, e:email,
+    m:LarpSession.generateMembershipNo(),
+    t:pendingPlan,
+    d:LarpSession.memberSinceLabel()
+  };
+  pushSessionToUrl();
+  fillCredential();
+  document.getElementById('welcomeMemNo').textContent = session.m;
+  show('welcome');
+});
+
+/* ---- sign in ---- */
+document.getElementById('signinForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const email = document.getElementById('signEmail').value.trim();
+  const found = LarpSession.findByEmail(email);
+  if(found){
+    session = found;
+    pushSessionToUrl();
+    fillCredential();
+    show('mylarp');
+  } else {
+    show('notfound');
+  }
+});
+
+/* ---- edit profile ---- */
+document.querySelectorAll('[data-goto="edit"]').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    document.getElementById('editName').value = session.n;
+    document.getElementById('editEmail').value = session.e;
+    document.getElementById('editMemNo').value = session.m;
+  });
+});
+document.getElementById('editForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  session.n = document.getElementById('editName').value.trim();
+  session.e = document.getElementById('editEmail').value.trim();
+  pushSessionToUrl();
+  fillCredential();
+  show('mylarp');
+  toast('Profile updated.');
+});
+
+/* ---- sign out ---- */
+document.getElementById('signOutBtn').addEventListener('click', (e)=>{
+  e.preventDefault();
+  session = null;
+  history.replaceState(null, '', location.pathname);
+  LarpSession.propagateToLinks();
+  if(window.LARPMenu) window.LARPMenu.render();
+  show('landing');
+});
+</script>
+</body>
+</html>
