@@ -131,11 +131,13 @@ ul{list-style:none;}
   border-top:1px solid var(--line);
   padding:clamp(36px,6vw,56px) 0 clamp(24px,4vw,32px);
   margin-top:clamp(60px,10vw,120px);
+  text-align:center;
 }
-.footer-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:24px;align-items:flex-end;}
+.footer-row{display:flex;flex-wrap:wrap;justify-content:center;gap:24px;align-items:flex-end;}
 .footer-word{font-family:var(--font-display);font-size:clamp(38px,8vw,72px);text-transform:uppercase;line-height:.9;}
-.footer-meta{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.5;}
-.footer-links{display:flex;gap:22px;flex-wrap:wrap;}
+.footer-meta{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.5;max-width:64ch;margin-inline:auto;}
+.footer-meta a{text-decoration:underline;text-underline-offset:3px;opacity:1;}
+.footer-links{display:flex;gap:22px;flex-wrap:wrap;justify-content:center;}
 .footer-links a{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.6;}
 .footer-links a:hover{opacity:1;}
 
