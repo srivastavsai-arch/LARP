@@ -27,5 +27,22 @@ service cloud.firestore {
 
       allow delete: if false;
     }
+
+    /* Public directory of member NAMES only (see members.html).
+       Contains nothing else: the keys().hasOnly(['name']) guard means
+       no email / membership number / tier / status / uid can ever be
+       stored here. Private members/{uid} docs stay private. */
+    match /publicMembers/{userId} {
+
+      allow read: if true;
+
+      allow create, update: if request.auth != null
+                    && request.auth.uid == userId
+                    && request.resource.data.keys().hasOnly(['name'])
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() > 0;
+
+      allow delete: if false;
+    }
   }
 }

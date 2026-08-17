@@ -195,6 +195,25 @@ const LarpSession = (function(){
     };
   }
 
+  /* ---------- public directory (members.html) ----------
+     Mirrors ONLY the member name into publicMembers/{uid}.
+     Best-effort: a directory failure never breaks the private
+     member/account flow. The field is guarded by Firestore rules
+     (keys().hasOnly(['name'])), so nothing else can be stored. */
+  function syncPublicName(uid, name){
+    if(!fbReady()) return Promise.resolve();
+    const F = window.LarpFirebase;
+    const clean = String(name || '').trim();
+    if(!clean) return Promise.resolve();
+    return F.db.collection('publicMembers').doc(uid).get()
+      .then(function(doc){
+        if(!doc.exists || (doc.data().name || '') !== clean){
+          return F.db.collection('publicMembers').doc(uid).set({ name: clean });
+        }
+      })
+      .catch(function(){ /* silent: never fail the member flow */ });
+  }
+
   async function createMember(opts){
     if(!fbReady()) return null;
     const F = window.LarpFirebase;
@@ -213,6 +232,7 @@ const LarpSession = (function(){
       s: 'Active'
     };
     await F.db.collection('members').doc(uid).set(memberDocPayload(uid, m));
+    syncPublicName(uid, m.n);
     return m;
   }
 
@@ -241,6 +261,7 @@ const LarpSession = (function(){
       s: 'Active'
     };
     await F.db.collection('members').doc(uid).set(memberDocPayload(uid, m));
+    syncPublicName(uid, m.n);
     return m;
   }
 
@@ -262,6 +283,7 @@ const LarpSession = (function(){
       email: fields.email,
       updatedAt: new Date().toISOString()
     });
+    syncPublicName(user.uid, fields.name);
     return {
       n: fields.name, e: fields.email,
       m: data.membershipNumber || data.membershipNo || '',
@@ -290,7 +312,11 @@ const LarpSession = (function(){
           if(doc.exists){
             /* existing member: load their record. NEVER re-create
                or re-generate a membership number here. */
-            set(memberDataFromDoc(doc.data()));
+            const member = memberDataFromDoc(doc.data());
+            set(member);
+            /* keep the public name directory in sync (covers members
+               registered before this feature existed) */
+            syncPublicName(user.uid, member.n);
           }
           /* authenticated but no record yet: creation happens exactly
              once inside createMember / signInWithGoogle, so the

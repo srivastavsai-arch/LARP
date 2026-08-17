@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Members · LARP™</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="StaggeredMenu.css">
+<style>
+:root{--accent:#5227FF;}
+.members-stage{
+  min-height:100svh;
+  position:relative;
+  padding:calc(var(--nav-h) + clamp(20px,4vw,44px)) var(--gutter) clamp(60px,9vw,120px);
+}
+.members-micro{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  display:flex;align-items:center;gap:12px;opacity:.6;
+  margin-bottom:clamp(26px,5vw,48px);
+}
+.members-micro .dot{width:7px;height:7px;border-radius:50%;background:var(--black);flex:0 0 7px;}
+.members-micro-page{margin-left:auto;letter-spacing:.12em;}
+.members-display{
+  font-family:var(--font-display);
+  font-size:clamp(38px,10.5vw,148px);
+  line-height:.9;text-transform:uppercase;letter-spacing:-.01em;
+}
+.members-index{
+  position:absolute;right:var(--gutter);top:calc(var(--nav-h) + clamp(20px,4vw,44px));
+  font-family:var(--font-mono);font-size:clamp(80px,16vw,240px);line-height:1;color:var(--black);
+  opacity:.055;user-select:none;pointer-events:none;z-index:0;
+}
+@media (max-width:640px){.members-index{font-size:40vw;}}
+
+/* total counter */
+.members-total{
+  display:flex;flex-direction:column;
+  margin-top:clamp(40px,7vw,80px);
+  border-top:1px solid var(--line-strong);
+  padding-top:clamp(18px,2.6vw,24px);
+}
+.members-total-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.55;}
+.members-total-num{
+  font-family:var(--font-mono);
+  font-size:clamp(64px,15vw,220px);
+  line-height:.95;letter-spacing:.02em;margin-top:clamp(6px,1vw,12px);
+}
+.members-note{
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+  opacity:.55;max-width:44ch;margin-top:clamp(16px,2vw,24px);line-height:1.75;
+}
+
+/* directory grid */
+.members-list{
+  list-style:none;margin:0;padding:0;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));
+  column-gap:clamp(24px,4vw,48px);
+  margin-top:clamp(48px,8vw,96px);
+}
+.member-row{
+  padding:clamp(14px,2vw,20px) clamp(4px,1vw,10px);
+  border-top:1px solid var(--line-strong);
+  display:flex;align-items:baseline;gap:clamp(12px,1.6vw,18px);
+  opacity:0;transform:translateY(18px);
+  transition:opacity .7s var(--ease),transform .7s var(--ease);
+}
+.member-row.is-in{opacity:1;transform:none;}
+.member-idx{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;opacity:.45;flex:0 0 auto;}
+.member-name{
+  font-family:var(--font-display);
+  font-size:clamp(19px,2.6vw,30px);
+  text-transform:uppercase;letter-spacing:-.01em;line-height:1;
+  overflow-wrap:break-word;
+}
+.member-row:nth-child(3n+1){transition-delay:.05s;}
+.member-row:nth-child(3n+2){transition-delay:.12s;}
+.member-row:nth-child(3n+3){transition-delay:.19s;}
+.members-empty{
+  margin-top:clamp(48px,8vw,96px);
+  padding-top:clamp(18px,2.6vw,24px);
+  border-top:1px solid var(--line-strong);
+  font-family:var(--font-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+  opacity:.55;line-height:1.75;max-width:46ch;
+}
+.members-foot{
+  margin-top:clamp(48px,8vw,88px);
+  padding-top:clamp(18px,2.6vw,24px);
+  border-top:1px solid var(--line-strong);
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  opacity:.45;line-height:1.8;max-width:56ch;
+}
+</style>
+</head>
+<body>
+
+<div id="menu-root" aria-label="Main navigation"></div>
+
+<main class="wrap members-stage">
+  <div class="members-index">06</div>
+  <div class="members-micro">
+    Member directory <span class="dot"></span>
+    <span class="members-micro-page">Names / 06</span>
+  </div>
+  <h1 class="members-display">MEMBERS</h1>
+
+  <div class="members-total">
+    <span class="members-total-label">Total licensed members</span>
+    <span class="members-total-num" id="memberCount">0</span>
+  </div>
+  <p class="members-note">A directory of LARP license holders. Names only — everything else stays private.</p>
+
+  <ul class="members-list" id="membersList"></ul>
+  <p class="members-empty" id="membersEmpty" style="display:none;">The directory is growing. Names appear here as members register.</p>
+
+  <p class="members-foot">Directory shows names only. Email, membership number, tier and all other member data remain private.</p>
+</main>
+
+<script src="app.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-init.js"></script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react" src="StaggeredMenu.jsx"></script>
+<script type="text/babel" data-presets="react" src="menu-mount.jsx"></script>
+
+<script>
+(function(){
+  var countEl = document.getElementById('memberCount');
+  var listEl = document.getElementById('membersList');
+  var emptyEl = document.getElementById('membersEmpty');
+  var names = [];
+
+  function animateCount(total){
+    if(!window.gsap || !countEl || total <= 0){
+      if(countEl) countEl.textContent = String(total);
+      return;
+    }
+    var obj = { v: 0 };
+    gsap.to(obj, {
+      v: total,
+      duration: 1.8,
+      ease: 'power3.out',
+      onUpdate: function(){
+        countEl.textContent = String(Math.round(obj.v));
+      }
+    });
+  }
+
+  function revealRows(){
+    if(!('IntersectionObserver' in window)){
+      listEl.querySelectorAll('.member-row').forEach(function(r){ r.classList.add('is-in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){
+          en.target.classList.add('is-in');
+          io.unobserve(en.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.1 });
+    listEl.querySelectorAll('.member-row').forEach(function(r){ io.observe(r); });
+  }
+
+  function render(names){
+    if(!names.length){
+      listEl.innerHTML = '';
+      emptyEl.style.display = 'block';
+      animateCount(0);
+      return;
+    }
+    emptyEl.style.display = 'none';
+    var frag = document.createDocumentFragment();
+    names.forEach(function(name, i){
+      var li = document.createElement('li');
+      li.className = 'member-row';
+      var idx = document.createElement('span');
+      idx.className = 'member-idx';
+      idx.textContent = String(i + 1).padStart(2, '0');
+      var nm = document.createElement('span');
+      nm.className = 'member-name';
+      nm.textContent = name;
+      li.appendChild(idx);
+      li.appendChild(nm);
+      frag.appendChild(li);
+    });
+    listEl.innerHTML = '';
+    listEl.appendChild(frag);
+    animateCount(names.length);
+    revealRows();
+  }
+
+  function load(){
+    if(!window.LarpSession || !window.LarpSession.fbReady() || !window.LarpFirebase){
+      render([]);
+      return;
+    }
+    window.LarpFirebase.db.collection('publicMembers').get()
+      .then(function(snap){
+        var all = [];
+        snap.forEach(function(d){
+          var n = d.data() && d.data().name;
+          if(n && String(n).trim()) all.push(String(n).trim());
+        });
+        all.sort(function(a, b){ return a.toLowerCase().localeCompare(b.toLowerCase()); });
+        names = all;
+        render(names);
+      })
+      .catch(function(){ render([]); });
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>
