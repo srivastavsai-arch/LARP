@@ -105,25 +105,25 @@
   backface-visibility:hidden;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:var(--white);
-  padding:6%;
+  padding:7.5%;
   overflow:hidden;
 }
-.card-face-back{transform:rotateY(180deg);justify-content:space-between;padding:8% 8%;}
+.card-face-back{transform:rotateY(180deg);justify-content:space-between;padding:9.5% 10%;}
 .card-front-word{
   font-family:var(--font-display);font-size:clamp(48px,16vw,88px);text-transform:uppercase;letter-spacing:-.01em;
 }
 .card-front-sub{
-  position:absolute;bottom:8%;left:8%;
+  position:absolute;bottom:10%;left:10%;
   font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;opacity:.5;
 }
 .card-front-corner{
-  position:absolute;top:8%;right:8%;
+  position:absolute;top:10%;right:10%;
   font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;opacity:.5;
 }
 .card-back-top{width:100%;text-align:center;}
 .card-back-title{font-family:var(--font-mono);font-size:clamp(10px,2vw,12px);letter-spacing:.14em;text-transform:uppercase;}
 .card-back-sep{
-  position:relative;width:60%;height:1px;background:rgba(0,0,0,.5);margin:5% auto;
+  position:relative;width:60%;height:1px;background:rgba(0,0,0,.5);margin:7% auto;
 }
 .card-back-sep .card-back-star{
   position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
@@ -131,10 +131,10 @@
   font-size:clamp(12px,2.4vw,16px);color:var(--black);
 }
 .card-back-mid{width:100%;text-align:center;}
-.card-back-name{font-family:var(--font-mono);font-size:clamp(11px,2.1vw,13px);letter-spacing:.06em;margin-bottom:4px;}
+.card-back-name{font-family:var(--font-mono);font-size:clamp(11px,2.1vw,13px);letter-spacing:.06em;margin-bottom:6px;}
 .card-back-memno{font-family:var(--font-mono);font-size:clamp(11px,2.1vw,13px);letter-spacing:.06em;opacity:.7;}
 .card-back-copy{
-  font-family:var(--font-body);font-size:clamp(8px,1.6vw,9.5px);line-height:1.5;text-align:center;
+  font-family:var(--font-body);font-size:clamp(8px,1.6vw,9.5px);line-height:1.55;text-align:center;
   max-width:88%;opacity:.75;
 }
 .card-back-tag{font-family:var(--font-mono);font-size:clamp(8.5px,1.7vw,10px);letter-spacing:.1em;text-transform:uppercase;text-align:center;}
@@ -144,7 +144,7 @@
 }
 .card-hint{
   font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
-  opacity:.45;margin-top:26px;text-align:center;
+  opacity:.45;margin-top:34px;text-align:center;
 }
 
 /* edit details */
@@ -425,9 +425,9 @@ function renderCard(session){
         <p class="license-sub">A CR80 laminate certifying the holder as an official practitioner of LARPing in all forms and fictions.</p>
         <div class="license-actions">
           <button type="button" class="license-action is-primary" id="genLicenseBtn"><span class="dot"></span><span>Generate License</span><span class="arrow">→</span></button>
+          <button type="button" class="license-action" id="downloadBtn"><span class="dot"></span><span>Download</span><span class="arrow">→</span></button>
           <button type="button" class="license-action" id="editDetailsBtn"><span class="dot"></span><span>Edit Details</span><span class="arrow">→</span></button>
           <button type="button" class="license-action" id="saveLicenseBtn"><span class="dot"></span><span>Save License</span><span class="arrow">→</span></button>
-          <button type="button" class="license-action" id="downloadBtn"><span class="dot"></span><span>Download</span><span class="arrow">→</span></button>
           <button type="button" class="license-action" id="flipCardBtn"><span class="dot"></span><span>Flip Card</span><span class="arrow">→</span></button>
         </div>
         <div class="license-edit" id="licenseEdit" aria-hidden="true">

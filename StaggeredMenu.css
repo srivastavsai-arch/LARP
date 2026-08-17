@@ -620,8 +620,24 @@
 }
 
 @media (max-width: 760px) {
+  .staggered-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sm-left {
+    justify-self: unset;
+    margin-right: auto;
+  }
+
   .sm-center {
     display: none;
+  }
+
+  .sm-right {
+    justify-self: unset;
+    margin-left: auto;
   }
 }
 
