@@ -1,0 +1,38 @@
+// LARP — Firestore security rules
+// Paste into Firebase Console → Firestore Database → Rules.
+// Ownership is enforced by Firebase Auth UID: a user can only touch
+// the document in /members/{uid} where uid matches their auth UID.
+// The membership number, tier and member-since date are set at
+// registration and can NEVER be modified by the client afterwards.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /members/{uid} {
+      // users may create only their own member record
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.name is string
+        && request.resource.data.email is string
+        && request.resource.data.membershipNo is string
+        && request.resource.data.tier is string
+        && request.resource.data.memberSince is string;
+
+      // users may read only their own record
+      allow read: if request.auth != null && request.auth.uid == uid;
+
+      // users may update only their own record, and only name/email.
+      // membership number, tier and member-since are locked forever.
+      allow update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.membershipNo == resource.data.membershipNo
+        && request.resource.data.tier == resource.data.tier
+        && request.resource.data.memberSince == resource.data.memberSince
+        && request.resource.data.name is string
+        && request.resource.data.email is string;
+
+      // no deletion
+      allow delete: if false;
+    }
+  }
+}

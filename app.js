@@ -176,10 +176,12 @@ const LarpSession = (function(){
     var doc = await F.db.collection('members').doc(user.uid).get();
     if(!doc.exists) return null;
     var data = doc.data();
-    await F.db.collection('members').doc(user.uid).update({ name:fields.name, email:fields.email });
     if(fields.email && fields.email !== user.email){
-      try{ await user.updateEmail(fields.email); }catch(err){}
+      // update Firebase Auth first: if reauth is required, this throws
+      // and the Firestore doc stays untouched (no silent mismatch)
+      await user.updateEmail(fields.email);
     }
+    await F.db.collection('members').doc(user.uid).update({ name:fields.name, email:fields.email });
     return { n:fields.name, e:fields.email, m:data.membershipNo, t:data.tier, d:data.memberSince };
   }
 

@@ -599,7 +599,8 @@ document.getElementById('editForm').addEventListener('submit', async (e)=>{
       const updated = await LarpSession.updateMember({ name, email });
       if(updated) session = updated;
     }catch(err){
-      toast((err && err.message) || 'Could not update your details.');
+      const code = err && err.code;
+      toast(code === 'auth/requires-recent-login' ? 'Sign in again before changing your email.' : ((err && err.message) || 'Could not update your details.'));
       return;
     }
   } else {

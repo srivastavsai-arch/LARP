@@ -1,0 +1,23 @@
+# Env files — never commit real credentials
+.env
+.env.*
+!.env.example
+
+# Firebase service accounts / private keys
+*.service-account.json
+serviceAccount*.json
+*-firebase-adminsdk-*.json
+*.pem
+*.key
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Logs / OS junk
+*.log
+.DS_Store
+Thumbs.db
