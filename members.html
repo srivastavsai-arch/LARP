@@ -201,16 +201,20 @@
     revealRows();
   }
 
-  var loading = false;
-  function load(){
-    if(loading) return;
+  var subscribed = false;
+  function subscribe(){
+    if(subscribed) return;
     if(!window.LarpSession || !window.LarpSession.fbReady() || !window.LarpFirebase){
       render([]);
       return;
     }
-    loading = true;
-    window.LarpFirebase.db.collection('publicMembers').get()
-      .then(function(snap){
+    subscribed = true;
+    /* Real-time directory: the count and names update automatically
+       when a new member registers (or an existing member's name is
+       edited) — no manual refresh needed. Count = publicMembers docs,
+       which mirror members 1:1 (one doc per registered account). */
+    window.LarpFirebase.db.collection('publicMembers').onSnapshot(
+      function(snap){
         var all = [];
         snap.forEach(function(d){
           var n = d.data() && d.data().name;
@@ -219,18 +223,12 @@
         all.sort(function(a, b){ return a.toLowerCase().localeCompare(b.toLowerCase()); });
         names = all;
         render(names);
-      })
-      .catch(function(){ render([]); })
-      .then(function(){ loading = false; });
+      },
+      function(){ render([]); }
+    );
   }
 
-  load();
-  /* Re-read the directory once the auth session settles: watchAuth
-     backfills the signed-in viewer's own publicMembers doc first, so
-     existing pre-feature members see themselves counted immediately. */
-  if(window.LarpSession && window.LarpSession.onChange){
-    window.LarpSession.onChange(function(){ load(); });
-  }
+  subscribe();
 })();
 </script>
 </body>
