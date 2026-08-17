@@ -116,7 +116,78 @@ const LarpSession = (function(){
     return page;
   }
 
-  return { current, findByEmail, generateMembershipNo, memberSinceLabel, propagateToLinks, urlWithSession, toParams };
+  /* ---------- Firebase member helpers ----------
+     These activate only when firebase-init.js found a real config.
+     Full member records live in Firestore: members/{uid}. */
+  function fbReady(){
+    var F = window.LarpFirebase;
+    return !!(F && F.ready && F.auth && F.db);
+  }
+
+  function memberDataFromDoc(d){
+    return { n:d.name||'', e:d.email||'', m:d.membershipNo||'', t:d.tier||'LARP', d:d.memberSince||'' };
+  }
+
+  function memberDocPayload(m){
+    return { name:m.n, email:m.e, membershipNo:m.m, tier:m.t, memberSince:m.d };
+  }
+
+  async function createMember(opts){
+    if(!fbReady()) return null;
+    var F = window.LarpFirebase;
+    var cred = await F.auth.createUserWithEmailAndPassword(opts.email, opts.password);
+    var m = { n:opts.name, e:opts.email, m:generateMembershipNo(), t:opts.tier||'LARP', d:memberSinceLabel() };
+    await F.db.collection('members').doc(cred.user.uid).set(memberDocPayload(m));
+    return m;
+  }
+
+  async function signInWithEmail(email, password){
+    if(!fbReady()) return null;
+    var F = window.LarpFirebase;
+    var cred = await F.auth.signInWithEmailAndPassword(email, password);
+    var doc = await F.db.collection('members').doc(cred.user.uid).get();
+    if(!doc.exists) return null;
+    return memberDataFromDoc(doc.data());
+  }
+
+  async function signInWithGoogle(){
+    if(!fbReady()) return null;
+    var F = window.LarpFirebase;
+    var cred = await F.auth.signInWithPopup(F.google);
+    var uid = cred.user.uid;
+    var doc = await F.db.collection('members').doc(uid).get();
+    if(doc.exists) return memberDataFromDoc(doc.data());
+    var m = {
+      n: cred.user.displayName || (cred.user.email||'').split('@')[0] || 'Member',
+      e: cred.user.email || '',
+      m: generateMembershipNo(),
+      t: 'LARP',
+      d: memberSinceLabel()
+    };
+    await F.db.collection('members').doc(uid).set(memberDocPayload(m));
+    return m;
+  }
+
+  async function updateMember(fields){
+    if(!fbReady()) return null;
+    var F = window.LarpFirebase;
+    var user = F.auth.currentUser;
+    if(!user) return null;
+    var doc = await F.db.collection('members').doc(user.uid).get();
+    if(!doc.exists) return null;
+    var data = doc.data();
+    await F.db.collection('members').doc(user.uid).update({ name:fields.name, email:fields.email });
+    if(fields.email && fields.email !== user.email){
+      try{ await user.updateEmail(fields.email); }catch(err){}
+    }
+    return { n:fields.name, e:fields.email, m:data.membershipNo, t:data.tier, d:data.memberSince };
+  }
+
+  function signOut(){
+    if(fbReady()) window.LarpFirebase.auth.signOut();
+  }
+
+  return { current, findByEmail, generateMembershipNo, memberSinceLabel, propagateToLinks, urlWithSession, toParams, fbReady, createMember, signInWithEmail, signInWithGoogle, updateMember, signOut };
 })();
 
 window.LarpSession = LarpSession;
@@ -131,4 +202,13 @@ function refreshAccountLinks(){
 document.addEventListener('DOMContentLoaded', ()=>{
   LarpSession.propagateToLinks();
   refreshAccountLinks();
+});
+
+/* menu "Sign out" clears the Firebase session too (menu renders
+   after DOMContentLoaded, so use a delegated listener) */
+document.addEventListener('click', (e)=>{
+  const el = e.target.closest ? e.target.closest('[data-modifier="signout"]') : null;
+  if(el){
+    if(LarpSession.fbReady()) LarpSession.signOut();
+  }
 });

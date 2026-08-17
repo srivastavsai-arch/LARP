@@ -81,12 +81,15 @@
   aspect-ratio:85.6 / 53.98;
   position:relative;
   perspective:1400px;
+  touch-action:none;
 }
 .card{
   width:100%;height:100%;position:relative;
   transform-style:preserve-3d;
-  cursor:pointer;
+  cursor:grab;
+  will-change:transform;
 }
+.card.is-grabbing{cursor:grabbing;}
 .card-face{
   position:absolute;inset:0;
   border-radius:5.2%/8.3%;
@@ -99,7 +102,7 @@
 }
 .card-face-back{transform:rotateY(180deg);justify-content:space-between;padding:8% 8%;}
 .card-front-word{
-  font-family:var(--font-display);font-size:clamp(38px,13vw,64px);text-transform:uppercase;letter-spacing:-.01em;
+  font-family:var(--font-display);font-size:clamp(48px,16vw,88px);text-transform:uppercase;letter-spacing:-.01em;
 }
 .card-front-sub{
   position:absolute;bottom:8%;left:8%;
@@ -111,8 +114,14 @@
 }
 .card-back-top{width:100%;text-align:center;}
 .card-back-title{font-family:var(--font-mono);font-size:clamp(10px,2vw,12px);letter-spacing:.14em;text-transform:uppercase;}
-.card-back-sep{width:60%;height:1px;background:var(--black);opacity:.5;margin:5% auto;}
-.card-back-star{font-size:clamp(12px,2.4vw,16px);margin:2% 0;}
+.card-back-sep{
+  position:relative;width:60%;height:1px;background:rgba(0,0,0,.5);margin:5% auto;
+}
+.card-back-sep .card-back-star{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  background:var(--white);padding:0 4px;line-height:1;
+  font-size:clamp(12px,2.4vw,16px);color:var(--black);
+}
 .card-back-mid{width:100%;text-align:center;}
 .card-back-name{font-family:var(--font-mono);font-size:clamp(11px,2.1vw,13px);letter-spacing:.06em;margin-bottom:4px;}
 .card-back-memno{font-family:var(--font-mono);font-size:clamp(11px,2.1vw,13px);letter-spacing:.06em;opacity:.7;}
@@ -124,10 +133,6 @@
 .card-hint{
   font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
   opacity:.45;margin-top:26px;text-align:center;
-}
-.card-back-email{
-  font-family:var(--font-mono);font-size:clamp(10px,1.9vw,12px);letter-spacing:.05em;
-  opacity:.55;margin-bottom:4px;word-break:break-all;
 }
 
 /* edit details */
@@ -200,6 +205,12 @@
 
 <script src="app.js"></script>
 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-init.js"></script>
+
 <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
@@ -225,22 +236,20 @@ function initCard(){
   const card = document.getElementById('licenseCard');
   if(!card) return;
   const outer = card.parentElement;
-  const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
-  const maxTilt = 13;
 
-  let flipped = false;
-  let targetX = 0, targetY = 0, curX = 0, curY = 0;
+  let rotX = 0, rotY = 0;
+  let targetX = 0, targetY = 0;
   let raf = null;
+  let dragging = false, moved = false, startX = 0, startY = 0;
 
   function apply(){
-    const rotY = flipped ? 180 - curX : curX;
-    card.style.transform = 'rotateY(' + rotY + 'deg) rotateX(' + curY + 'deg)';
+    card.style.transform = 'rotateX(' + rotX.toFixed(2) + 'deg) rotateY(' + rotY.toFixed(2) + 'deg)';
   }
   function loop(){
-    curX += (targetX - curX) * 0.13;
-    curY += (targetY - curY) * 0.13;
+    rotX += (targetX - rotX) * 0.16;
+    rotY += (targetY - rotY) * 0.16;
     apply();
-    if(Math.abs(targetX - curX) > 0.06 || Math.abs(targetY - curY) > 0.06){
+    if(Math.abs(targetX - rotX) > 0.06 || Math.abs(targetY - rotY) > 0.06){
       raf = requestAnimationFrame(loop);
     } else {
       raf = null;
@@ -250,46 +259,46 @@ function initCard(){
   function startLoop(){ if(!raf) raf = requestAnimationFrame(loop); }
   function stopLoop(){ if(raf){ cancelAnimationFrame(raf); raf = null; } }
 
-  function toggleFlip(){
-    flipped = !flipped;
-    targetX = 0; targetY = 0;
+  function flipToOpposite(){
+    targetY = Math.round(targetY / 180) * 180 + 180;
+    targetX = 0;
     startLoop();
   }
-  window.__licenseFlip = toggleFlip;
+  window.__licenseFlip = flipToOpposite;
 
-  if(!isTouch){
-    outer.addEventListener('mousemove', (e)=>{
-      const r = outer.getBoundingClientRect();
-      targetX = ((e.clientX - r.left) / r.width - 0.5) * maxTilt * 2;
-      targetY = -((e.clientY - r.top) / r.height - 0.5) * maxTilt * 2;
-      startLoop();
-    });
-    outer.addEventListener('mouseleave', ()=>{ targetX = 0; targetY = 0; });
-    outer.addEventListener('click', toggleFlip);
-  } else {
-    let startX = 0, startY = 0, dragging = false, moved = false;
-    outer.addEventListener('touchstart', (e)=>{
-      const t = e.touches[0];
-      startX = t.clientX; startY = t.clientY;
-      dragging = true; moved = false;
-    }, {passive:true});
-    outer.addEventListener('touchmove', (e)=>{
-      if(!dragging) return;
-      const t = e.touches[0];
-      const dx = t.clientX - startX;
-      const dy = t.clientY - startY;
-      if(Math.abs(dx) > 8 || Math.abs(dy) > 8) moved = true;
-      const r = outer.getBoundingClientRect();
-      targetX = (dx / r.width) * maxTilt * 2;
-      targetY = -(dy / r.height) * maxTilt * 2;
-      startLoop();
-    }, {passive:true});
-    outer.addEventListener('touchend', ()=>{
-      dragging = false;
-      targetX = 0; targetY = 0;
-      if(!moved) toggleFlip();
-    });
+  outer.addEventListener('pointerdown', (e)=>{
+    dragging = true; moved = false;
+    startX = e.clientX; startY = e.clientY;
+    card.classList.add('is-grabbing');
+    stopLoop();
+    try{ outer.setPointerCapture(e.pointerId); }catch(err){}
+  });
+
+  outer.addEventListener('pointermove', (e)=>{
+    if(!dragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if(Math.abs(dx) > 6 || Math.abs(dy) > 6) moved = true;
+    startX = e.clientX; startY = e.clientY;
+    targetY += dx * 0.6;
+    targetX += -dy * 0.6;
+    if(targetX > 80) targetX = 80;
+    if(targetX < -80) targetX = -80;
+    startLoop();
+  });
+
+  function endDrag(){
+    if(!dragging) return;
+    dragging = false;
+    card.classList.remove('is-grabbing');
+    if(!moved) flipToOpposite();
+    targetX = 0;
+    startLoop();
   }
+
+  outer.addEventListener('pointerup', endDrag);
+  outer.addEventListener('pointercancel', endDrag);
+  outer.addEventListener('dragstart', (e)=>e.preventDefault());
 }
 
 function downloadLicense(){
@@ -428,12 +437,10 @@ function renderCard(session){
             <div class="card-face card-face-back">
               <div class="card-back-top">
                 <div class="card-back-title">License to LARP</div>
-                <div class="card-back-sep"></div>
+                <div class="card-back-sep"><span class="card-back-star" aria-hidden="true">★</span></div>
               </div>
-              <div class="card-back-star">★</div>
               <div class="card-back-mid">
                 <div class="card-back-name">NAME: ${esc((session.n||'').toUpperCase())}</div>
-                <div class="card-back-email">EMAIL: ${esc((session.e||'').toLowerCase())}</div>
                 <div class="card-back-memno">MEMBERSHIP NO: ${session.m}</div>
               </div>
               <div class="card-back-copy">This card certifies the holder as an official practitioner of LARPing in all forms and fictions.</div>
@@ -441,7 +448,7 @@ function renderCard(session){
             </div>
           </div>
         </div>
-        <div class="card-hint">Move to tilt · click to flip</div>
+        <div class="card-hint">Drag to rotate · click to flip</div>
       </div>
     </div>
   `;

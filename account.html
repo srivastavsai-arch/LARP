@@ -264,6 +264,10 @@
         <label class="field-label" for="regEmail"><span class="dot"></span>Email</label>
         <input class="field-input" id="regEmail" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
       </div>
+      <div class="acct-field">
+        <label class="field-label" for="regPassword"><span class="dot"></span>Password</label>
+        <input class="field-input" id="regPassword" name="password" type="password" placeholder="Create a password" autocomplete="new-password" required>
+      </div>
       <button type="submit" class="acct-submit">
         Continue
         <span class="arrow">→</span>
@@ -293,6 +297,10 @@
         <label class="field-label" for="signEmail"><span class="dot"></span>Email</label>
         <input class="field-input" id="signEmail" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
       </div>
+      <div class="acct-field">
+        <label class="field-label" for="signPassword"><span class="dot"></span>Password</label>
+        <input class="field-input" id="signPassword" name="password" type="password" placeholder="Your password" autocomplete="current-password" required>
+      </div>
       <button type="submit" class="acct-submit">
         Continue
         <span class="arrow">→</span>
@@ -306,7 +314,7 @@
           <span class="google-label">Sign in with Google</span>
         </button>
       </div>
-      <span class="field-note">Try <strong>demo@larp.club</strong> to sign in to a sample account.</span>
+      <span class="field-note">Sign in with the email and password you registered with.</span>
       <span class="field-error" id="signError" style="display:none;"></span>
     </form>
   </section>
@@ -408,6 +416,12 @@
 
 <script src="app.js"></script>
 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-init.js"></script>
+
 <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
@@ -495,36 +509,77 @@ document.querySelectorAll('[data-goto]').forEach(el=>{
 });
 
 /* ---- register ---- */
-document.getElementById('registerForm').addEventListener('submit', (e)=>{
+document.getElementById('registerForm').addEventListener('submit', async (e)=>{
   e.preventDefault();
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim();
-  if(!name || !email) return;
-  session = {
-    n:name, e:email,
-    m:LarpSession.generateMembershipNo(),
-    t:pendingPlan,
-    d:LarpSession.memberSinceLabel()
-  };
-  pushSessionToUrl();
-  fillCredential();
-  document.getElementById('welcomeMemNo').textContent = session.m;
-  show('welcome');
+  const password = document.getElementById('regPassword').value;
+  const errEl = document.getElementById('regError');
+  errEl.style.display = 'none';
+  if(!name || !email || !password) return;
+  try{
+    if(LarpSession.fbReady()){
+      session = await LarpSession.createMember({ name, email, password, tier: pendingPlan });
+      if(!session) throw new Error('Firebase is not configured yet.');
+    } else {
+      session = {
+        n:name, e:email,
+        m:LarpSession.generateMembershipNo(),
+        t:pendingPlan,
+        d:LarpSession.memberSinceLabel()
+      };
+    }
+    pushSessionToUrl();
+    fillCredential();
+    document.getElementById('welcomeMemNo').textContent = session.m;
+    show('welcome');
+  }catch(err){
+    errEl.textContent = (err && err.message) || 'Could not register.';
+    errEl.style.display = 'block';
+  }
 });
 
 /* ---- sign in ---- */
-document.getElementById('signinForm').addEventListener('submit', (e)=>{
+document.getElementById('signinForm').addEventListener('submit', async (e)=>{
   e.preventDefault();
   const email = document.getElementById('signEmail').value.trim();
-  const found = LarpSession.findByEmail(email);
-  if(found){
-    session = found;
+  const password = document.getElementById('signPassword').value;
+  const errEl = document.getElementById('signError');
+  errEl.style.display = 'none';
+  try{
+    if(LarpSession.fbReady()){
+      session = await LarpSession.signInWithEmail(email, password);
+      if(!session) throw new Error('No member record found for that account.');
+    } else {
+      const found = LarpSession.findByEmail(email);
+      if(!found){ show('notfound'); return; }
+      session = found;
+    }
     pushSessionToUrl();
     fillCredential();
     show('mylarp');
-  } else {
-    show('notfound');
+  }catch(err){
+    errEl.textContent = (err && err.message) || 'Sign in failed.';
+    errEl.style.display = 'block';
   }
+});
+
+/* ---- google sign in (real when Firebase is configured) ---- */
+document.querySelectorAll('.google-btn').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    if(!LarpSession.fbReady()){
+      toast('Google sign-in is not configured yet.');
+      return;
+    }
+    try{
+      session = await LarpSession.signInWithGoogle();
+      pushSessionToUrl();
+      fillCredential();
+      show('mylarp');
+    }catch(err){
+      toast((err && err.message) || 'Google sign-in failed.');
+    }
+  });
 });
 
 /* ---- edit profile ---- */
@@ -535,10 +590,22 @@ document.querySelectorAll('[data-goto="edit"]').forEach(el=>{
     document.getElementById('editMemNo').value = session.m;
   });
 });
-document.getElementById('editForm').addEventListener('submit', (e)=>{
+document.getElementById('editForm').addEventListener('submit', async (e)=>{
   e.preventDefault();
-  session.n = document.getElementById('editName').value.trim();
-  session.e = document.getElementById('editEmail').value.trim();
+  const name = document.getElementById('editName').value.trim();
+  const email = document.getElementById('editEmail').value.trim();
+  if(LarpSession.fbReady()){
+    try{
+      const updated = await LarpSession.updateMember({ name, email });
+      if(updated) session = updated;
+    }catch(err){
+      toast((err && err.message) || 'Could not update your details.');
+      return;
+    }
+  } else {
+    session.n = name;
+    session.e = email;
+  }
   pushSessionToUrl();
   fillCredential();
   show('mylarp');
@@ -548,6 +615,7 @@ document.getElementById('editForm').addEventListener('submit', (e)=>{
 /* ---- sign out ---- */
 document.getElementById('signOutBtn').addEventListener('click', (e)=>{
   e.preventDefault();
+  if(LarpSession.fbReady()) LarpSession.signOut();
   session = null;
   history.replaceState(null, '', location.pathname);
   LarpSession.propagateToLinks();
