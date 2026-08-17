@@ -107,10 +107,10 @@
   <h1 class="members-display">MEMBERS</h1>
 
   <div class="members-total">
-    <span class="members-total-label">Total licensed members</span>
+    <span class="members-total-label">Total registered members</span>
     <span class="members-total-num" id="memberCount">0</span>
   </div>
-  <p class="members-note">A directory of LARP license holders. Names only — everything else stays private.</p>
+  <p class="members-note">A directory of LARP accounts. Names only — everything else stays private.</p>
 
   <ul class="members-list" id="membersList"></ul>
   <p class="members-empty" id="membersEmpty" style="display:none;">The directory is growing. Names appear here as members register.</p>
@@ -201,11 +201,14 @@
     revealRows();
   }
 
+  var loading = false;
   function load(){
+    if(loading) return;
     if(!window.LarpSession || !window.LarpSession.fbReady() || !window.LarpFirebase){
       render([]);
       return;
     }
+    loading = true;
     window.LarpFirebase.db.collection('publicMembers').get()
       .then(function(snap){
         var all = [];
@@ -217,10 +220,17 @@
         names = all;
         render(names);
       })
-      .catch(function(){ render([]); });
+      .catch(function(){ render([]); })
+      .then(function(){ loading = false; });
   }
 
   load();
+  /* Re-read the directory once the auth session settles: watchAuth
+     backfills the signed-in viewer's own publicMembers doc first, so
+     existing pre-feature members see themselves counted immediately. */
+  if(window.LarpSession && window.LarpSession.onChange){
+    window.LarpSession.onChange(function(){ load(); });
+  }
 })();
 </script>
 </body>
