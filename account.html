@@ -354,7 +354,7 @@
       <div class="credential-row"><span class="cred-key">Email</span><span class="cred-val" id="cardEmail">··</span></div>
       <div class="credential-row"><span class="cred-key">Membership number</span><span class="cred-val" id="cardMemNo">··</span></div>
       <div class="credential-row"><span class="cred-key">Membership</span><span class="cred-val" id="cardTier">··</span></div>
-      <div class="credential-row"><span class="cred-key">Status</span><span class="cred-val"><span class="status-dot"></span>Active</span></div>
+      <div class="credential-row"><span class="cred-key">Status</span><span class="cred-val"><span class="status-dot"></span><span id="cardStatus">Active</span></span></div>
       <div class="credential-row"><span class="cred-key">Member since</span><span class="cred-val" id="cardSince">··</span></div>
     </div>
     <div class="acct-actions">
@@ -416,9 +416,9 @@
 
 <script src="app.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="firebase-init.js"></script>
 
@@ -462,11 +462,45 @@ function show(id){
 }
 
 function pushSessionToUrl(){
-  const p = LarpSession.toParams(session);
-  const qs = p.toString();
-  history.replaceState(null, '', location.pathname + (qs ? '?'+qs : ''));
-  LarpSession.propagateToLinks();
-  if(window.LARPMenu) window.LARPMenu.render();
+  LarpSession.set(session);
+}
+
+function planPrice(tier){
+  if(tier === 'LARP+') return '5,000';
+  if(tier === 'LARP BLACK') return '10,000';
+  return '2,000';
+}
+
+function registerError(err){
+  const code = err && err.code;
+  if(code === 'auth/email-already-in-use') return 'That email is already registered. Sign in instead.';
+  if(code === 'auth/weak-password') return 'Password too weak. Use at least 6 characters.';
+  if(code === 'auth/invalid-email') return 'That email address looks invalid.';
+  if(code === 'auth/operation-not-allowed') return 'Email/password sign-up is not enabled. Enable it in Firebase console → Authentication → Sign-in method.';
+  if(code === 'auth/too-many-requests') return 'Too many attempts. Try again in a moment.';
+  if(code === 'auth/network-request-failed') return 'Network error. Check your connection and try again.';
+  return 'Could not register. Please try again.';
+}
+
+function signInError(err){
+  const code = err && err.code;
+  if(code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') return 'Email or password is incorrect.';
+  if(code === 'auth/invalid-email') return 'That email address looks invalid.';
+  if(code === 'auth/operation-not-allowed') return 'Email/password sign-in is not enabled. Enable it in Firebase console → Authentication → Sign-in method.';
+  if(code === 'auth/too-many-requests') return 'Too many attempts. Try again in a moment.';
+  if(code === 'auth/network-request-failed') return 'Network error. Check your connection and try again.';
+  return 'Sign in failed. Please try again.';
+}
+
+function googleError(err){
+  const code = err && err.code;
+  if(code === 'auth/popup-closed-by-user') return 'Sign-in cancelled.';
+  if(code === 'auth/popup-blocked') return 'Popup blocked. Allow popups for this site and try again.';
+  if(code === 'auth/unauthorized-domain') return 'This domain is not authorized for Google sign-in. Add it in Firebase console → Authentication → Settings → Authorized domains.';
+  if(code === 'auth/operation-not-allowed') return 'Google sign-in is not enabled. Enable it in Firebase console → Authentication → Sign-in method.';
+  if(code === 'auth/network-request-failed') return 'Network error. Check your connection and try again.';
+  if(code === 'auth/account-exists-with-different-credential') return 'An account already exists with this email. Sign in with your password instead.';
+  return 'Could not sign in. Please try again.';
 }
 
 function fillCredential(){
@@ -476,7 +510,27 @@ function fillCredential(){
   document.getElementById('cardMemNoBig').textContent = session.m;
   document.getElementById('cardTier').textContent = session.t;
   document.getElementById('cardSince').textContent = session.d;
+  document.getElementById('cardStatus').textContent = session.s || 'Active';
 }
+
+/* keep the page in sync with the session store (Firebase auth
+   restore, sign in, sign out, profile edits) */
+let autoNavBlocked = false;
+let welcomeShownFor = null;
+LarpSession.onChange(function(s){
+  if(autoNavBlocked){ autoNavBlocked = false; return; }
+  if(!s){
+    welcomeShownFor = null;
+    session = null;
+    show('landing');
+    return;
+  }
+  session = s;
+  fillCredential();
+  if(welcomeShownFor === s.m) return;
+  welcomeShownFor = null;
+  show('mylarp');
+});
 
 /* ---- initial routing ---- */
 if(session){
@@ -492,12 +546,6 @@ if(session){
   } else {
     show('landing');
   }
-}
-
-function planPrice(tier){
-  if(tier === 'LARP+') return '5,000';
-  if(tier === 'LARP BLACK') return '10,000';
-  return '2,000';
 }
 
 /* ---- nav between static views ---- */
@@ -517,6 +565,7 @@ document.getElementById('registerForm').addEventListener('submit', async (e)=>{
   const errEl = document.getElementById('regError');
   errEl.style.display = 'none';
   if(!name || !email || !password) return;
+  autoNavBlocked = true;
   try{
     if(LarpSession.fbReady()){
       session = await LarpSession.createMember({ name, email, password, tier: pendingPlan });
@@ -526,15 +575,18 @@ document.getElementById('registerForm').addEventListener('submit', async (e)=>{
         n:name, e:email,
         m:LarpSession.generateMembershipNo(),
         t:pendingPlan,
-        d:LarpSession.memberSinceLabel()
+        d:LarpSession.memberSinceLabel(),
+        s:'Active'
       };
     }
+    welcomeShownFor = session.m;
     pushSessionToUrl();
     fillCredential();
     document.getElementById('welcomeMemNo').textContent = session.m;
     show('welcome');
   }catch(err){
-    errEl.textContent = (err && err.message) || 'Could not register.';
+    autoNavBlocked = false;
+    errEl.textContent = registerError(err);
     errEl.style.display = 'block';
   }
 });
@@ -559,7 +611,7 @@ document.getElementById('signinForm').addEventListener('submit', async (e)=>{
     fillCredential();
     show('mylarp');
   }catch(err){
-    errEl.textContent = (err && err.message) || 'Sign in failed.';
+    errEl.textContent = signInError(err);
     errEl.style.display = 'block';
   }
 });
@@ -577,7 +629,7 @@ document.querySelectorAll('.google-btn').forEach(btn=>{
       fillCredential();
       show('mylarp');
     }catch(err){
-      toast((err && err.message) || 'Google sign-in failed.');
+      toast(googleError(err));
     }
   });
 });
@@ -600,7 +652,7 @@ document.getElementById('editForm').addEventListener('submit', async (e)=>{
       if(updated) session = updated;
     }catch(err){
       const code = err && err.code;
-      toast(code === 'auth/requires-recent-login' ? 'Sign in again before changing your email.' : ((err && err.message) || 'Could not update your details.'));
+      toast(code === 'auth/requires-recent-login' ? 'Sign in again before changing your email.' : 'Could not update your details.');
       return;
     }
   } else {
@@ -617,11 +669,7 @@ document.getElementById('editForm').addEventListener('submit', async (e)=>{
 document.getElementById('signOutBtn').addEventListener('click', (e)=>{
   e.preventDefault();
   if(LarpSession.fbReady()) LarpSession.signOut();
-  session = null;
-  history.replaceState(null, '', location.pathname);
-  LarpSession.propagateToLinks();
-  if(window.LARPMenu) window.LARPMenu.render();
-  show('landing');
+  LarpSession.clear();
 });
 </script>
 </body>

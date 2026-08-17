@@ -20,6 +20,12 @@
       db: window.firebase.firestore(),
       google: new window.firebase.auth.GoogleAuthProvider()
     };
+    /* drop any URL-carried mock session now that Firebase is live,
+       then start the persistent auth restore (onAuthStateChanged) */
+    if(window.LarpSession){
+      if(window.LarpSession.onFirebaseReady) window.LarpSession.onFirebaseReady();
+      if(window.LarpSession.watchAuth) window.LarpSession.watchAuth();
+    }
   }catch(err){
     window.LarpFirebase = null;
   }

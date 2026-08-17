@@ -19,13 +19,15 @@
     function sec(id){ return onIndex ? ('#' + id) : ('index.html#' + id); }
     function toPage(page){
       if(!session) return page;
+      /* Firebase mode: member data never goes in the URL */
+      if(window.LarpSession.fbReady()) return page;
       var qs = window.LarpSession.toParams(session).toString();
       return qs ? (page + '?' + qs) : page;
     }
     function pageWithMode(page, mode){
       var p = new URLSearchParams();
       if(mode) p.set('mode', mode);
-      if(session){ window.LarpSession.toParams(session).forEach(function(v,k){ p.set(k,v); }); }
+      if(session && !window.LarpSession.fbReady()){ window.LarpSession.toParams(session).forEach(function(v,k){ p.set(k,v); }); }
       var qs = p.toString();
       return qs ? (page + '?' + qs) : page;
     }
@@ -39,6 +41,9 @@
       { label: 'My LARP', ariaLabel: 'Go to your account', link: toPage('account.html') },
       { label: 'My License', ariaLabel: 'View your license', link: toPage('license.html') }
     ];
+
+    var accountLink = session ? toPage('account.html') : pageWithMode('account.html', 'signin');
+    var accountLabel = session ? 'MY ACCOUNT' : 'SIGN IN';
 
     var footerItems;
     if(session){
@@ -68,7 +73,9 @@
       colors: ['#B497CF', '#5227FF'],
       logoUrl: 'larp-logo.svg',
       faqLink: toPage('faq.html'),
-      accountLink: toPage('account.html'),
+      accountLink: accountLink,
+      accountLabel: accountLabel,
+      homeLink: toPage('index.html'),
       accentColor: '#5227FF',
       isFixed: true,
       closeOnClickAway: true,
@@ -88,4 +95,10 @@
 
   window.LARPMenu = { render: render };
   render();
+
+  /* re-render the menu whenever the session changes
+     (Firebase auth restore, sign in, sign out, edit) */
+  if(window.LarpSession && window.LarpSession.onChange){
+    window.LarpSession.onChange(function(){ render(); });
+  }
 })();

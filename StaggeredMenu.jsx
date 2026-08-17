@@ -19,6 +19,8 @@ const StaggeredMenu = ({
   logoUrl = '/src/assets/logos/reactbits-gh-white.svg',
   faqLink = 'faq.html',
   accountLink = 'account.html',
+  homeLink = 'index.html',
+  accountLabel = 'MY ACCOUNT',
   menuButtonColor = '#fff',
   openMenuButtonColor = '#fff',
   accentColor = '#5227FF',
@@ -413,16 +415,16 @@ const StaggeredMenu = ({
           </a>
         </div>
         <div className="sm-center">
-          <div className="sm-logo" aria-label="Logo">
+          <a className="sm-logo-link" href={homeLink} aria-label="LARP home">
             <img
               src={logoUrl || '/src/assets/logos/reactbits-gh-white.svg'}
-              alt="Logo"
+              alt="LARP"
               className="sm-logo-img"
               draggable={false}
               width={110}
               height={24}
             />
-          </div>
+          </a>
         </div>
         <div className="sm-right">
           <div className="sm-actions">
@@ -433,7 +435,7 @@ const StaggeredMenu = ({
                   <path d="M4.5 20c1.4-3.4 4.3-5 7.5-5s6.1 1.6 7.5 5" />
                 </svg>
               </span>
-              <span className="nav-acct-label">MY ACCOUNT</span>
+              <span className="nav-acct-label">{accountLabel}</span>
             </a>
             <button
           ref={toggleBtnRef}

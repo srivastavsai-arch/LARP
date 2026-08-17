@@ -171,12 +171,12 @@
 .license-edit-inner .acct-micro{margin-top:clamp(30px,5vw,48px);}
 .license-actions{transition:opacity .4s var(--ease),transform .5s var(--ease);}
 .license-actions.is-editing{opacity:0;pointer-events:none;transform:translateY(-12px);}
-.license-edit-actions{display:flex;align-items:center;margin-top:clamp(20px,3.5vw,32px);}
+.license-edit-actions{display:flex;flex-wrap:wrap;align-items:center;gap:clamp(12px,2vw,20px);margin-top:clamp(20px,3.5vw,32px);}
 .license-edit-actions .acct-submit{margin-top:0;}
 .license-edit-cancel{
   font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
   background:none;border:none;border-bottom:1px solid var(--black);
-  color:inherit;cursor:pointer;padding:4px 2px;margin-left:clamp(20px,3vw,36px);
+  color:inherit;cursor:pointer;padding:4px 2px;margin-left:0;
   opacity:.6;transition:opacity .3s,border-color .3s;
 }
 .license-edit-cancel:hover{opacity:1;border-color:var(--accent);}
@@ -205,9 +205,9 @@
 
 <script src="app.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="firebase-init.js"></script>
 
@@ -328,6 +328,11 @@ function downloadLicense(){
 }
 
 function saveLicense(){
+  if(LarpSession.fbReady()){
+    /* Firebase mode: the license lives in members/{uid}, not the URL */
+    toast('License saved.');
+    return;
+  }
   const p = new URLSearchParams(location.search);
   p.set('saved','1');
   if(session) LarpSession.toParams(session).forEach((v,k)=>p.set(k,v));
@@ -353,18 +358,29 @@ function closeEdit(){
   if(actions) actions.classList.remove('is-editing');
 }
 
-function saveDetails(e){
+async function saveDetails(e){
   e.preventDefault();
   const name = document.getElementById('editName').value.trim();
   const email = document.getElementById('editEmail').value.trim();
   if(!name){ toast('Name is required.'); return; }
   if(!email){ toast('Email is required.'); return; }
-  session.n = name;
-  session.e = email;
-  const p = LarpSession.toParams(session);
-  history.replaceState(null, '', location.pathname + (p.toString() ? '?'+p.toString() : ''));
-  LarpSession.propagateToLinks();
-  if(window.LARPMenu) window.LARPMenu.render();
+  if(LarpSession.fbReady()){
+    /* persist to Firebase Auth + Firestore members/{uid} so the
+       account and the license stay in sync */
+    try{
+      const updated = await LarpSession.updateMember({ name, email });
+      if(!updated){ toast('Could not update your details.'); return; }
+      session = updated;
+    }catch(err){
+      const code = err && err.code;
+      toast(code === 'auth/requires-recent-login' ? 'Sign in again before changing your email.' : 'Could not update your details.');
+      return;
+    }
+  } else {
+    session.n = name;
+    session.e = email;
+  }
+  LarpSession.set(session);
   renderCard(session);
   toast('Details updated.');
 }
@@ -485,10 +501,18 @@ function renderLocked(){
   LarpSession.propagateToLinks();
 }
 
-if(session){
-  renderCard(session);
-} else {
-  renderLocked();
+function renderFor(s){
+  session = s;
+  if(s){
+    renderCard(s);
+  } else {
+    renderLocked();
+  }
+}
+
+renderFor(session);
+if(window.LarpSession && window.LarpSession.onChange){
+  window.LarpSession.onChange(renderFor);
 }
 </script>
 </body>

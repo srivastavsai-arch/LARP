@@ -1,9 +1,9 @@
 /* ============================================================
    LARP — SHARED APP LOGIC
-   No backend yet. Account state is intentionally mocked and
-   carried between pages via the URL query string only —
-   no localStorage / sessionStorage / cookies are used.
-   Swap `LarpSession` for real auth later without touching pages.
+   Session source of truth:
+   1) Firebase persistent auth (onAuthStateChanged) when configured
+   2) URL-carried mock session otherwise
+   No passwords, tokens or private credentials are stored/logged.
    ============================================================ */
 
 /* ---------- mobile nav ---------- */
@@ -29,11 +29,10 @@
   });
 })();
 
-/* ---------- mock session (URL-carried) ---------- */
+/* ---------- session store ---------- */
 const LarpSession = (function(){
-  /* a tiny seeded "member directory" so Sign In has something to
-     mock-match against even on a fresh page load with no prior URL
-     state. Replace with a real backend lookup later. */
+  /* mock directory so Sign In has something to match against when
+     Firebase is not configured. Real auth always wins when present. */
   const DEMO_DIRECTORY = [
     { e:'demo@larp.club', n:'A. Pretender', m:'LARP-000001', t:'LARP', d:'2025' }
   ];
@@ -60,15 +59,18 @@ const LarpSession = (function(){
     return p;
   }
 
+  /* the single source of truth for the current session */
+  let memory = readFromUrl(location.search);
+  const listeners = [];
+
   function current(){
-    return readFromUrl(location.search);
+    return memory;
   }
 
   function findByEmail(email){
     const norm = (email||'').trim().toLowerCase();
     if(!norm) return null;
-    const sessionNow = current();
-    if(sessionNow && sessionNow.e.toLowerCase() === norm) return sessionNow;
+    if(memory && memory.e && memory.e.toLowerCase() === norm) return memory;
     const match = DEMO_DIRECTORY.find(d=>d.e.toLowerCase() === norm);
     return match ? {...match} : null;
   }
@@ -83,10 +85,25 @@ const LarpSession = (function(){
     return d.toLocaleString('en-US',{month:'short'}).toUpperCase() + ' ' + d.getFullYear();
   }
 
-  /* rewrite every same-site nav link on the page so the mock
-     session travels along as the visitor browses. Query params are
-     kept before any #fragment so section links survive too. */
+  /* when Firebase is live, member data NEVER rides in the URL:
+     links stay clean and the URL is never a source of truth. */
+  const URL_SESSION_KEYS = ['n','e','m','t','d'];
+
+  function stripSessionParamsFromUrl(){
+    if(!location.search) return;
+    const p = new URLSearchParams(location.search);
+    let dirty = false;
+    URL_SESSION_KEYS.forEach(k=>{
+      if(p.has(k)){ p.delete(k); dirty = true; }
+    });
+    if(dirty){
+      const qs = p.toString();
+      history.replaceState(null, '', location.pathname + (qs ? '?'+qs : '') + location.hash);
+    }
+  }
+
   function propagateToLinks(){
+    if(fbReady()) return;
     const session = current();
     document.querySelectorAll('a[data-carry-session]').forEach(a=>{
       const href = a.getAttribute('href') || '';
@@ -105,91 +122,189 @@ const LarpSession = (function(){
     });
   }
 
-  function urlWithSession(page, session, extra){
-    const p = toParams(session);
-    if(extra){ Object.keys(extra).forEach(k=>p.set(k, extra[k])); }
-    const qs = p.toString();
-    return qs ? (page + '?' + qs) : page;
+  function notify(){
+    try{ refreshAccountLinks(); }catch(err){}
+    listeners.slice().forEach(function(cb){
+      try{ cb(memory); }catch(err){}
+    });
   }
 
-  function signOutHref(page){
-    return page;
+  function set(session){
+    memory = session;
+    if(fbReady()){
+      /* Firebase is the source of truth: never write member data
+         to the URL. On sign-out, scrub any leftover params. */
+      if(!session) stripSessionParamsFromUrl();
+    } else {
+      history.replaceState(null, '', location.pathname + (session && session.m ? '?'+toParams(session).toString() : ''));
+      propagateToLinks();
+    }
+    notify();
+  }
+
+  function clear(){
+    set(null);
+  }
+
+  /* called by firebase-init.js once Firebase boots: drop any
+     URL-carried mock session so the URL is never a source of truth. */
+  function onFirebaseReady(){
+    memory = null;
+    stripSessionParamsFromUrl();
+  }
+
+  function onChange(cb){
+    listeners.push(cb);
+    return function(){
+      const i = listeners.indexOf(cb);
+      if(i > -1) listeners.splice(i, 1);
+    };
   }
 
   /* ---------- Firebase member helpers ----------
-     These activate only when firebase-init.js found a real config.
+     Activate only when firebase-init.js found a real config.
      Full member records live in Firestore: members/{uid}. */
   function fbReady(){
-    var F = window.LarpFirebase;
+    const F = window.LarpFirebase;
     return !!(F && F.ready && F.auth && F.db);
   }
 
   function memberDataFromDoc(d){
-    return { n:d.name||'', e:d.email||'', m:d.membershipNo||'', t:d.tier||'LARP', d:d.memberSince||'' };
+    return {
+      n: d.name || '',
+      e: d.email || '',
+      m: d.membershipNumber || d.membershipNo || '',
+      t: d.membershipTier || d.tier || 'LARP',
+      d: d.memberSince || '',
+      s: d.status || 'Active'
+    };
   }
 
-  function memberDocPayload(m){
-    return { name:m.n, email:m.e, membershipNo:m.m, tier:m.t, memberSince:m.d };
+  function memberDocPayload(uid, m){
+    const now = new Date().toISOString();
+    return {
+      uid: uid || '',
+      name: m.n,
+      email: m.e,
+      membershipNumber: m.m,
+      membershipTier: m.t,
+      status: m.s || 'Active',
+      memberSince: m.d,
+      createdAt: m.createdAt || now,
+      updatedAt: now
+    };
   }
 
   async function createMember(opts){
     if(!fbReady()) return null;
-    var F = window.LarpFirebase;
-    var cred = await F.auth.createUserWithEmailAndPassword(opts.email, opts.password);
-    var m = { n:opts.name, e:opts.email, m:generateMembershipNo(), t:opts.tier||'LARP', d:memberSinceLabel() };
-    await F.db.collection('members').doc(cred.user.uid).set(memberDocPayload(m));
+    const F = window.LarpFirebase;
+    const cred = await F.auth.createUserWithEmailAndPassword(opts.email, opts.password);
+    const uid = cred.user.uid;
+    /* check members/{uid} before creating: if a record already
+       exists (e.g. sign-in raced with the auth listener), load it.
+       The membership number is generated exactly once, only here. */
+    const existing = await F.db.collection('members').doc(uid).get();
+    if(existing.exists) return memberDataFromDoc(existing.data());
+    const m = {
+      n: opts.name, e: opts.email,
+      m: generateMembershipNo(),
+      t: opts.tier || 'LARP',
+      d: memberSinceLabel(),
+      s: 'Active'
+    };
+    await F.db.collection('members').doc(uid).set(memberDocPayload(uid, m));
     return m;
   }
 
   async function signInWithEmail(email, password){
     if(!fbReady()) return null;
-    var F = window.LarpFirebase;
-    var cred = await F.auth.signInWithEmailAndPassword(email, password);
-    var doc = await F.db.collection('members').doc(cred.user.uid).get();
+    const F = window.LarpFirebase;
+    const cred = await F.auth.signInWithEmailAndPassword(email, password);
+    const doc = await F.db.collection('members').doc(cred.user.uid).get();
     if(!doc.exists) return null;
     return memberDataFromDoc(doc.data());
   }
 
   async function signInWithGoogle(){
     if(!fbReady()) return null;
-    var F = window.LarpFirebase;
-    var cred = await F.auth.signInWithPopup(F.google);
-    var uid = cred.user.uid;
-    var doc = await F.db.collection('members').doc(uid).get();
+    const F = window.LarpFirebase;
+    const cred = await F.auth.signInWithPopup(F.google);
+    const uid = cred.user.uid;
+    const doc = await F.db.collection('members').doc(uid).get();
     if(doc.exists) return memberDataFromDoc(doc.data());
-    var m = {
+    const m = {
       n: cred.user.displayName || (cred.user.email||'').split('@')[0] || 'Member',
       e: cred.user.email || '',
       m: generateMembershipNo(),
       t: 'LARP',
-      d: memberSinceLabel()
+      d: memberSinceLabel(),
+      s: 'Active'
     };
-    await F.db.collection('members').doc(uid).set(memberDocPayload(m));
+    await F.db.collection('members').doc(uid).set(memberDocPayload(uid, m));
     return m;
   }
 
   async function updateMember(fields){
     if(!fbReady()) return null;
-    var F = window.LarpFirebase;
-    var user = F.auth.currentUser;
+    const F = window.LarpFirebase;
+    const user = F.auth.currentUser;
     if(!user) return null;
-    var doc = await F.db.collection('members').doc(user.uid).get();
+    const doc = await F.db.collection('members').doc(user.uid).get();
     if(!doc.exists) return null;
-    var data = doc.data();
+    const data = doc.data();
     if(fields.email && fields.email !== user.email){
-      // update Firebase Auth first: if reauth is required, this throws
-      // and the Firestore doc stays untouched (no silent mismatch)
+      /* update Firebase Auth first: if reauthentication is required
+         this throws and the Firestore doc stays untouched */
       await user.updateEmail(fields.email);
     }
-    await F.db.collection('members').doc(user.uid).update({ name:fields.name, email:fields.email });
-    return { n:fields.name, e:fields.email, m:data.membershipNo, t:data.tier, d:data.memberSince };
+    await F.db.collection('members').doc(user.uid).update({
+      name: fields.name,
+      email: fields.email,
+      updatedAt: new Date().toISOString()
+    });
+    return {
+      n: fields.name, e: fields.email,
+      m: data.membershipNumber || data.membershipNo || '',
+      t: data.membershipTier || data.tier || 'LARP',
+      d: data.memberSince || '',
+      s: data.status || 'Active'
+    };
   }
 
   function signOut(){
-    if(fbReady()) window.LarpFirebase.auth.signOut();
+    if(!fbReady()) return;
+    try{ window.LarpFirebase.auth.signOut().catch(function(){}); }catch(err){}
   }
 
-  return { current, findByEmail, generateMembershipNo, memberSinceLabel, propagateToLinks, urlWithSession, toParams, fbReady, createMember, signInWithEmail, signInWithGoogle, updateMember, signOut };
+  /* ---------- persistent auth restore ----------
+     Called once per page load (from firebase-init.js). Firebase
+     restores the authenticated session on refresh / reopen, so the
+     user never logs in twice while the session is valid. */
+  function watchAuth(){
+    if(!fbReady()) return;
+    const F = window.LarpFirebase;
+    F.auth.onAuthStateChanged(async function(user){
+      try{
+        if(user){
+          const doc = await F.db.collection('members').doc(user.uid).get();
+          if(doc.exists){
+            /* existing member: load their record. NEVER re-create
+               or re-generate a membership number here. */
+            set(memberDataFromDoc(doc.data()));
+          }
+          /* authenticated but no record yet: creation happens exactly
+             once inside createMember / signInWithGoogle, so the
+             membership number is never generated twice. */
+        } else {
+          set(null);
+        }
+      }catch(err){
+        /* silent: never log member data */
+      }
+    });
+  }
+
+  return { current, findByEmail, generateMembershipNo, memberSinceLabel, propagateToLinks, toParams, fbReady, createMember, signInWithEmail, signInWithGoogle, updateMember, signOut, set, clear, onChange, watchAuth, onFirebaseReady };
 })();
 
 window.LarpSession = LarpSession;
@@ -211,6 +326,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
 document.addEventListener('click', (e)=>{
   const el = e.target.closest ? e.target.closest('[data-modifier="signout"]') : null;
   if(el){
+    e.preventDefault();
     if(LarpSession.fbReady()) LarpSession.signOut();
+    LarpSession.clear();
   }
 });

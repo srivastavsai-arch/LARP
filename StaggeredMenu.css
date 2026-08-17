@@ -215,6 +215,13 @@
   user-select: none;
 }
 
+.sm-logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  line-height: 0;
+}
+
 .sm-logo-img {
   display: block;
   height: 32px;
