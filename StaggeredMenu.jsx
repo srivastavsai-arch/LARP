@@ -17,6 +17,8 @@ const StaggeredMenu = ({
   displayItemNumbering = true,
   className,
   logoUrl = '/src/assets/logos/reactbits-gh-white.svg',
+  faqLink = 'faq.html',
+  accountLink = 'account.html',
   menuButtonColor = '#fff',
   openMenuButtonColor = '#fff',
   accentColor = '#5227FF',
@@ -404,19 +406,36 @@ const StaggeredMenu = ({
         })()}
       </div>
       <header className="staggered-menu-header" aria-label="Main navigation header">
-        <div className="sm-logo" aria-label="Logo">
-          <img
-            src={logoUrl || '/src/assets/logos/reactbits-gh-white.svg'}
-            alt="Logo"
-            className="sm-logo-img"
-            draggable={false}
-            width={110}
-            height={24}
-          />
+        <div className="sm-left">
+          <a className="nav-faq" href={faqLink} aria-label="Open the FAQ">
+            <span className="nav-faq-q" aria-hidden="true">?</span>
+            <span className="nav-faq-label">FAQ</span>
+          </a>
         </div>
-        <div className="sm-actions">
-          <a className="sm-faq" href="faq.html" aria-label="Open the FAQ" title="FAQ">?</a>
-          <button
+        <div className="sm-center">
+          <div className="sm-logo" aria-label="Logo">
+            <img
+              src={logoUrl || '/src/assets/logos/reactbits-gh-white.svg'}
+              alt="Logo"
+              className="sm-logo-img"
+              draggable={false}
+              width={110}
+              height={24}
+            />
+          </div>
+        </div>
+        <div className="sm-right">
+          <div className="sm-actions">
+            <a className="nav-account" href={accountLink} aria-label="My account">
+              <span className="nav-acct-circle" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4.5 20c1.4-3.4 4.3-5 7.5-5s6.1 1.6 7.5 5" />
+                </svg>
+              </span>
+              <span className="nav-acct-label">MY ACCOUNT</span>
+            </a>
+            <button
           ref={toggleBtnRef}
           className="sm-toggle"
           aria-label={open ? 'Close menu' : 'Open menu'}
@@ -439,6 +458,7 @@ const StaggeredMenu = ({
             <span ref={plusVRef} className="sm-icon-line sm-icon-line-v" />
           </span>
         </button>
+          </div>
         </div>
       </header>
 

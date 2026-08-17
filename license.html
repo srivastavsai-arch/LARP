@@ -125,6 +125,56 @@
   font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
   opacity:.45;margin-top:26px;text-align:center;
 }
+.card-back-email{
+  font-family:var(--font-mono);font-size:clamp(10px,1.9vw,12px);letter-spacing:.05em;
+  opacity:.55;margin-bottom:4px;word-break:break-all;
+}
+
+/* edit details */
+.acct-form{max-width:560px;margin-top:clamp(28px,5vw,44px);}
+.acct-field{margin-bottom:clamp(26px,4.5vw,40px);}
+.field-label{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  display:flex;align-items:center;gap:10px;opacity:.55;margin-bottom:12px;
+}
+.field-label .dot{width:6px;height:6px;border-radius:50%;background:var(--black);}
+.field-input{
+  width:100%;border:none;border-bottom:1.5px solid var(--black);
+  padding:14px 2px;font-family:var(--font-display);font-size:clamp(24px,4.5vw,38px);
+  background:transparent;color:var(--black);letter-spacing:0;text-transform:none;
+  transition:padding .3s var(--ease),border-color .3s;
+}
+.field-input:focus{outline:none;padding-bottom:13px;border-bottom-color:var(--accent);}
+.field-input::placeholder{color:rgba(0,0,0,.25);}
+.field-input:disabled{opacity:.4;cursor:not-allowed;}
+.field-note{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.5;margin-top:clamp(18px,3vw,26px);display:block;}
+.acct-submit{
+  display:inline-flex;align-items:center;gap:14px;
+  font-family:var(--font-display);font-size:clamp(26px,5vw,44px);text-transform:uppercase;letter-spacing:-.01em;
+  border:none;border-bottom:2px solid var(--black);background:none;color:inherit;cursor:pointer;padding:6px 2px;
+  transition:gap .35s var(--ease),border-color .3s,color .3s;
+}
+.acct-submit:hover{gap:22px;color:var(--accent);border-color:var(--accent);}
+
+.license-edit{
+  display:grid;grid-template-rows:0fr;
+  opacity:0;transform:translateY(14px);pointer-events:none;
+  transition:grid-template-rows .55s var(--ease),opacity .4s var(--ease),transform .55s var(--ease);
+}
+.license-edit.is-open{grid-template-rows:1fr;opacity:1;transform:none;pointer-events:auto;}
+.license-edit-inner{overflow:hidden;}
+.license-edit-inner .acct-micro{margin-top:clamp(30px,5vw,48px);}
+.license-actions{transition:opacity .4s var(--ease),transform .5s var(--ease);}
+.license-actions.is-editing{opacity:0;pointer-events:none;transform:translateY(-12px);}
+.license-edit-actions{display:flex;align-items:center;margin-top:clamp(20px,3.5vw,32px);}
+.license-edit-actions .acct-submit{margin-top:0;}
+.license-edit-cancel{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  background:none;border:none;border-bottom:1px solid var(--black);
+  color:inherit;cursor:pointer;padding:4px 2px;margin-left:clamp(20px,3vw,36px);
+  opacity:.6;transition:opacity .3s,border-color .3s;
+}
+.license-edit-cancel:hover{opacity:1;border-color:var(--accent);}
 
 /* toast */
 .acct-toast{
@@ -160,7 +210,7 @@
 
 <script>
 const stage = document.getElementById('stage');
-const session = LarpSession.current();
+let session = LarpSession.current();
 const toastEl = document.getElementById('acctToast');
 let toastTimer = null;
 
@@ -252,6 +302,8 @@ function downloadLicense(){
       '<rect width="100%" height="100%" fill="#ffffff"/>' +
       '<rect x="2" y="2" width="'+(w-4)+'" height="'+(h-4)+'" rx="'+rx+'" fill="#ffffff" stroke="#000000" stroke-width="4"/>' +
       '<text x="'+(w/2)+'" y="'+(h/2+22)+'" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="150" font-weight="900" fill="#000000">LARP</text>' +
+      '<text x="80" y="'+(h-104)+'" font-family="monospace" font-size="24" letter-spacing="2" fill="#000000">'+esc((session.n||'').toUpperCase())+'</text>' +
+      '<text x="80" y="'+(h-72)+'" font-family="monospace" font-size="17" letter-spacing="1" opacity="0.7" fill="#000000">'+esc((session.e||''))+'</text>' +
       '<text x="80" y="'+(h-44)+'" font-family="monospace" font-size="26" letter-spacing="5" fill="#000000">LICENSE TO LARP</text>' +
       '<text x="'+(w-80)+'" y="'+(h-44)+'" text-anchor="end" font-family="monospace" font-size="26" letter-spacing="2" fill="#000000">'+esc(session.m)+'</text>' +
     '</svg>';
@@ -274,15 +326,55 @@ function saveLicense(){
   toast('License saved.');
 }
 
+function openEdit(){
+  document.getElementById('editName').value = session.n || '';
+  document.getElementById('editEmail').value = session.e || '';
+  document.getElementById('editMemNo').value = session.m || '';
+  const panel = document.getElementById('licenseEdit');
+  const actions = document.querySelector('.license-actions');
+  if(panel){ panel.classList.add('is-open'); panel.setAttribute('aria-hidden','false'); }
+  if(actions) actions.classList.add('is-editing');
+  setTimeout(()=>{ const n = document.getElementById('editName'); if(n) n.focus(); }, 360);
+}
+
+function closeEdit(){
+  const panel = document.getElementById('licenseEdit');
+  const actions = document.querySelector('.license-actions');
+  if(panel){ panel.classList.remove('is-open'); panel.setAttribute('aria-hidden','true'); }
+  if(actions) actions.classList.remove('is-editing');
+}
+
+function saveDetails(e){
+  e.preventDefault();
+  const name = document.getElementById('editName').value.trim();
+  const email = document.getElementById('editEmail').value.trim();
+  if(!name){ toast('Name is required.'); return; }
+  if(!email){ toast('Email is required.'); return; }
+  session.n = name;
+  session.e = email;
+  const p = LarpSession.toParams(session);
+  history.replaceState(null, '', location.pathname + (p.toString() ? '?'+p.toString() : ''));
+  LarpSession.propagateToLinks();
+  if(window.LARPMenu) window.LARPMenu.render();
+  renderCard(session);
+  toast('Details updated.');
+}
+
 function wireActions(){
   const genBtn = document.getElementById('genLicenseBtn');
   const flipBtn = document.getElementById('flipCardBtn');
   const saveBtn = document.getElementById('saveLicenseBtn');
   const dlBtn = document.getElementById('downloadBtn');
+  const editBtn = document.getElementById('editDetailsBtn');
   if(genBtn) genBtn.addEventListener('click', ()=>{ renderCard(session); toast('License generated.'); });
   if(flipBtn) flipBtn.addEventListener('click', ()=>{ if(window.__licenseFlip) window.__licenseFlip(); });
   if(saveBtn) saveBtn.addEventListener('click', saveLicense);
   if(dlBtn) dlBtn.addEventListener('click', downloadLicense);
+  if(editBtn) editBtn.addEventListener('click', openEdit);
+  const editCancel = document.getElementById('editCancelBtn');
+  if(editCancel) editCancel.addEventListener('click', closeEdit);
+  const editForm = document.getElementById('editDetailsForm');
+  if(editForm) editForm.addEventListener('submit', saveDetails);
 }
 
 function renderCard(session){
@@ -298,6 +390,31 @@ function renderCard(session){
           <button type="button" class="license-action" id="flipCardBtn"><span class="dot"></span><span>Flip Card</span><span class="arrow">→</span></button>
           <button type="button" class="license-action" id="saveLicenseBtn"><span class="dot"></span><span>Save License</span><span class="arrow">→</span></button>
           <button type="button" class="license-action" id="downloadBtn"><span class="dot"></span><span>Download</span><span class="arrow">→</span></button>
+          <button type="button" class="license-action" id="editDetailsBtn"><span class="dot"></span><span>Edit Details</span><span class="arrow">→</span></button>
+        </div>
+        <div class="license-edit" id="licenseEdit" aria-hidden="true">
+          <div class="license-edit-inner">
+            <div class="acct-micro">Edit details <span class="dot"></span> <span class="acct-micro-page">Profile</span></div>
+            <form class="acct-form" id="editDetailsForm" novalidate>
+              <div class="acct-field">
+                <label class="field-label" for="editName"><span class="dot"></span>Name</label>
+                <input class="field-input" id="editName" name="name" type="text" autocomplete="name" required>
+              </div>
+              <div class="acct-field">
+                <label class="field-label" for="editEmail"><span class="dot"></span>Email</label>
+                <input class="field-input" id="editEmail" name="email" type="email" autocomplete="email" required>
+              </div>
+              <div class="acct-field">
+                <label class="field-label"><span class="dot"></span>Membership number (system-generated)</label>
+                <input class="field-input" id="editMemNo" type="text" disabled>
+                <span class="field-note">Permanently locked · cannot be changed</span>
+              </div>
+              <div class="license-edit-actions">
+                <button type="submit" class="acct-submit">Save changes <span class="arrow">→</span></button>
+                <button type="button" class="license-edit-cancel" id="editCancelBtn">Cancel</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
       <div class="license-card-col">
@@ -315,7 +432,8 @@ function renderCard(session){
               </div>
               <div class="card-back-star">★</div>
               <div class="card-back-mid">
-                <div class="card-back-name">NAME: ${esc(session.n).toUpperCase()}</div>
+                <div class="card-back-name">NAME: ${esc((session.n||'').toUpperCase())}</div>
+                <div class="card-back-email">EMAIL: ${esc((session.e||'').toLowerCase())}</div>
                 <div class="card-back-memno">MEMBERSHIP NO: ${session.m}</div>
               </div>
               <div class="card-back-copy">This card certifies the holder as an official practitioner of LARPing in all forms and fictions.</div>

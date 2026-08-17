@@ -67,6 +67,8 @@
       changeMenuColorOnOpen: true,
       colors: ['#B497CF', '#5227FF'],
       logoUrl: 'larp-logo.svg',
+      faqLink: toPage('faq.html'),
+      accountLink: toPage('account.html'),
       accentColor: '#5227FF',
       isFixed: true,
       closeOnClickAway: true,
