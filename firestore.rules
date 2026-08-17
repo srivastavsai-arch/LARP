@@ -14,16 +14,29 @@ service cloud.firestore {
       allow read: if request.auth != null
                     && request.auth.uid == userId;
 
+      // The client may only ever write the fields set at registration
+      // (app.js memberDocPayload). hasOnly() blocks arbitrary extra
+      // fields such as isAdmin, role or license data.
       allow create: if request.auth != null
                     && request.auth.uid == userId
-                    && request.resource.data.uid == request.auth.uid;
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.keys().hasOnly([
+                      'uid', 'name', 'email', 'membershipNumber',
+                      'membershipTier', 'status', 'memberSince',
+                      'createdAt', 'updatedAt'
+                    ]);
 
       allow update: if request.auth != null
                     && request.auth.uid == userId
                     && request.resource.data.uid == resource.data.uid
                     && request.resource.data.membershipNumber == resource.data.membershipNumber
                     && request.resource.data.membershipTier == resource.data.membershipTier
-                    && request.resource.data.memberSince == resource.data.memberSince;
+                    && request.resource.data.memberSince == resource.data.memberSince
+                    && request.resource.data.keys().hasOnly([
+                      'uid', 'name', 'email', 'membershipNumber',
+                      'membershipTier', 'status', 'memberSince',
+                      'createdAt', 'updatedAt'
+                    ]);
 
       allow delete: if false;
     }
