@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FAQ · LARP™</title>
+<meta name="description" content="Everything you never asked about LARP, answered with a straight face.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.faq-main{position:relative;}
+.faq-ghost{
+  position:absolute;right:var(--gutter);top:calc(var(--nav-h) + clamp(16px,3vw,36px));
+  font-family:var(--font-display);font-size:clamp(80px,18vw,260px);line-height:1;color:var(--black);
+  opacity:.05;user-select:none;pointer-events:none;z-index:0;
+}
+.faq-main .page-title{font-size:clamp(44px,11vw,150px);}
+.faq-list{position:relative;z-index:1;margin-top:clamp(30px,5vw,60px);}
+.fq{
+  display:grid;grid-template-columns:clamp(44px,6vw,90px) 1fr;gap:clamp(20px,4vw,64px);
+  padding:clamp(34px,6vw,60px) 0;border-top:1px solid var(--line);
+  align-items:start;
+}
+.fq:last-of-type{border-bottom:1px solid var(--line);}
+.fq-num{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;opacity:.45;
+  padding-top:clamp(8px,1vw,16px);display:flex;align-items:center;gap:12px;
+}
+.fq-num .dot{width:7px;height:7px;border-radius:50%;background:var(--black);flex:0 0 7px;}
+.fq-q{
+  font-family:var(--font-display);font-size:clamp(28px,5.4vw,64px);
+  line-height:.96;text-transform:uppercase;letter-spacing:-.01em;max-width:22ch;
+}
+.fq-line{width:clamp(40px,6vw,80px);height:1px;background:var(--black);transform-origin:left;margin-top:clamp(16px,2.5vw,26px);}
+.fq-a{
+  font-family:var(--font-body);font-size:clamp(15px,1.6vw,18px);line-height:1.7;opacity:.72;
+  max-width:52ch;margin-top:clamp(16px,2.5vw,26px);
+  opacity:0;transform:translateY(20px);
+  will-change:opacity,transform;
+}
+.fq-a strong{font-weight:600;}
+.faq-end{
+  margin-top:clamp(40px,7vw,80px);display:flex;flex-direction:column;align-items:flex-start;gap:14px;
+}
+@media (max-width:640px){
+  .fq{grid-template-columns:1fr;gap:12px;}
+  .fq-num{padding-top:0;gap:10px;}
+}
+@media (prefers-reduced-motion: reduce){
+  .fq-a{opacity:1 !important;transform:none !important;}
+  .fq-line{transform:scaleX(1) !important;}
+}
+html.no-gsap .fq-a{opacity:1 !important;transform:none !important;}
+html.no-gsap .fq-line{transform:scaleX(1) !important;}
+</style>
+</head>
+<body>
+
+<div id="menu-root" aria-label="Main navigation"></div>
+
+<main class="wrap faq-main">
+  <div class="faq-ghost" aria-hidden="true">FAQ</div>
+
+  <header class="page-head" style="position:relative;z-index:1;">
+    <div class="page-eyebrow">Questions</div>
+    <h1 class="page-title">Good<br>questions.</h1>
+    <p class="page-sub">Ten answers, no fine print. Read them slowly. Every one is serious, in the way that matters.</p>
+  </header>
+
+  <section class="faq-list" aria-label="Frequently asked questions">
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>01</span>
+      <div>
+        <h2 class="fq-q">What is LARP?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">Live Action Role Playing. In the real world it means dressing up and pretending to be someone else for fun. On this site it means the same thing, with better stationery.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>02</span>
+      <div>
+        <h2 class="fq-q">What does LARP mean?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">It stands for Live Action Role Playing. Here it is treated as a lifestyle, a credential and a punchline. All three are accurate.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>03</span>
+      <div>
+        <h2 class="fq-q">Why would someone LARP?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">Because everyone is already pretending. LARP just makes it official, gives you a number, a card, and a community that fully commits to the bit.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>04</span>
+      <div>
+        <h2 class="fq-q">Is LARPing serious?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">Completely serious about being unserious. The execution is precise. The premise is a joke we tell with a straight face.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>05</span>
+      <div>
+        <h2 class="fq-q">Who can join LARP?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">Anyone over 18 who can commit to the bit. No interviews, no references, no experience required. Pretending is a skill you already have.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>06</span>
+      <div>
+        <h2 class="fq-q">What do I get with membership?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">A membership number, a digital license, full standing in the community, and the right to call yourself a licensed professional pretender.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>07</span>
+      <div>
+        <h2 class="fq-q">What is the LARP license?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">An official looking document that licenses you to LARP. It is very convincing. That is the point.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>08</span>
+      <div>
+        <h2 class="fq-q">Is the LARP license real?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">No. It is a real looking document for a fictional organization. That distinction is exactly what makes it work.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>09</span>
+      <div>
+        <h2 class="fq-q">How does membership work?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">Pick a tier, enter your name, get licensed. There is no fine print because there is no contract. The bit is the binding agreement.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>10</span>
+      <div>
+        <h2 class="fq-q">Can I create my own LARP identity?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">Yes. That is the whole product. Pick a name, a tier and a persona. We just make it look good on paper.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="faq-end">
+    <p class="page-sub" style="margin-top:0;">Still pretending to have questions?</p>
+    <a href="account.html?mode=register" class="btn btn-solid" data-carry-session>
+      Get Licensed
+      <svg viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.4"/></svg>
+    </a>
+  </div>
+</main>
+
+<footer class="site-footer wrap">
+  <div class="footer-row">
+    <div class="footer-word">LARP™</div>
+    <div class="footer-links">
+      <a href="index.html" data-carry-session>Home</a>
+      <a href="index.html#manifesto" data-carry-session>Manifesto</a>
+      <a href="index.html#membership" data-carry-session>Membership</a>
+      <a href="license.html" data-carry-session>License</a>
+      <a href="faq.html" data-carry-session>FAQ</a>
+      <a href="privacy.html" data-carry-session>Privacy</a>
+      <a href="account.html" data-carry-session data-account-link>Account</a>
+    </div>
+  </div>
+  <div class="footer-meta" style="margin-top:20px;">© 2026 LARP™ · License to LARP. All pretending reserved.</div>
+  <div class="footer-meta" style="margin-top:10px;">Designed &amp; built by YELURI SRIVASTAV SAI · <a href="https://github.com/srivastavsai-arch/" target="_blank" rel="noopener noreferrer">github.com/srivastavsai-arch</a></div>
+</footer>
+
+<script src="app.js"></script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react" src="StaggeredMenu.jsx"></script>
+<script type="text/babel" data-presets="react" src="menu-mount.jsx"></script>
+
+<script>
+(function(){
+  if(!window.gsap || !window.ScrollTrigger){
+    document.documentElement.classList.add('no-gsap');
+    return;
+  }
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.utils.toArray('.fq').forEach(function(block){
+    var a = block.querySelector('.fq-a');
+    var line = block.querySelector('.fq-line');
+    if(a){
+      gsap.to(a, {
+        opacity:1, y:0, duration:.9, ease:'power3.out',
+        scrollTrigger:{ trigger:block, start:'top 82%' }
+      });
+    }
+    if(line){
+      gsap.fromTo(line, { scaleX:0 }, {
+        scaleX:1, duration:1, ease:'power3.inOut',
+        scrollTrigger:{ trigger:block, start:'top 85%' }
+      });
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -34,6 +34,46 @@
   pointer-events: auto;
 }
 
+.sm-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: auto;
+}
+
+.sm-faq {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  min-height: 42px;
+  flex: 0 0 42px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--white);
+  color: #111;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.sm-faq:hover {
+  background: #111;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+}
+
+.sm-faq:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 3px;
+}
+
 .sm-logo {
   display: flex;
   align-items: center;
@@ -442,6 +482,27 @@
     width: 100%;
     left: 0;
     right: 0;
+  }
+
+  .staggered-menu-header {
+    padding: max(1em, env(safe-area-inset-top, 0px)) max(1em, env(safe-area-inset-right, 0px));
+  }
+
+  .sm-logo-img {
+    height: 22px;
+  }
+
+  .sm-toggle {
+    padding: 9px 12px;
+    min-height: 40px;
+  }
+
+  .sm-faq {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    flex: 0 0 40px;
+    font-size: 16px;
   }
 
   .staggered-menu-wrapper[data-open] .sm-logo-img {

@@ -414,7 +414,9 @@ const StaggeredMenu = ({
             height={24}
           />
         </div>
-        <button
+        <div className="sm-actions">
+          <a className="sm-faq" href="faq.html" aria-label="Open the FAQ" title="FAQ">?</a>
+          <button
           ref={toggleBtnRef}
           className="sm-toggle"
           aria-label={open ? 'Close menu' : 'Open menu'}
@@ -437,6 +439,7 @@ const StaggeredMenu = ({
             <span ref={plusVRef} className="sm-icon-line sm-icon-line-v" />
           </span>
         </button>
+        </div>
       </header>
 
       <aside

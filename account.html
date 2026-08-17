@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Account — LARP™</title>
+<title>Account · LARP™</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -102,6 +102,22 @@
 .field-note{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.5;margin-top:clamp(20px,3vw,30px);display:block;}
 .field-note strong{font-weight:500;}
 .field-error{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.05em;margin-top:16px;padding:12px 0;border-top:1px solid var(--line);display:block;}
+
+.google-block{margin-top:clamp(20px,3.5vw,32px);}
+.google-or{display:flex;align-items:center;gap:12px;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.45;margin-bottom:16px;}
+.google-or::before,.google-or::after{content:'';flex:1;height:1px;background:var(--line);}
+.google-btn{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:12px;
+  padding:clamp(14px,2.4vw,18px) 18px;border:1px solid var(--black);border-radius:999px;
+  background:var(--white);color:var(--black);
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;
+  cursor:pointer;transition:background .3s var(--ease),color .3s var(--ease),transform .3s var(--ease),box-shadow .3s var(--ease);
+}
+.google-btn:hover{background:var(--black);color:var(--white);transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.16);}
+.google-btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+.google-g{width:18px;height:18px;flex:0 0 18px;}
+.google-g svg{width:100%;height:100%;display:block;}
+.google-btn:hover .google-g svg path{fill:#fff;}
 
 .acct-submit{
   display:inline-flex;align-items:center;gap:14px;margin-top:clamp(20px,3.5vw,32px);
@@ -220,7 +236,7 @@
         <span class="choice-name">Register</span>
         <span class="choice-arrow">→</span>
         <span class="choice-line"></span>
-        <span class="choice-sub">New here. Get licensed — free, in about ten seconds.</span>
+        <span class="choice-sub">New here. Get licensed. Free, in about ten seconds.</span>
       </a>
       <a class="choice" href="#" data-goto="signin">
         <span class="choice-num">02</span>
@@ -252,6 +268,15 @@
         Continue
         <span class="arrow">→</span>
       </button>
+      <div class="google-block" role="presentation">
+        <div class="google-or"><span>or</span></div>
+        <button type="button" class="google-btn" aria-label="Continue with Google">
+          <span class="google-g" aria-hidden="true">
+            <svg viewBox="0 0 48 48"><path fill="#000" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#000" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#000" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#000" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          </span>
+          <span class="google-label">Continue with Google</span>
+        </button>
+      </div>
       <span class="field-note" id="regPlanNote"></span>
       <span class="field-error" id="regError" style="display:none;"></span>
     </form>
@@ -272,6 +297,15 @@
         Continue
         <span class="arrow">→</span>
       </button>
+      <div class="google-block" role="presentation">
+        <div class="google-or"><span>or</span></div>
+        <button type="button" class="google-btn" aria-label="Sign in with Google">
+          <span class="google-g" aria-hidden="true">
+            <svg viewBox="0 0 48 48"><path fill="#000" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#000" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#000" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#000" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          </span>
+          <span class="google-label">Sign in with Google</span>
+        </button>
+      </div>
       <span class="field-note">Try <strong>demo@larp.club</strong> to sign in to a sample account.</span>
       <span class="field-error" id="signError" style="display:none;"></span>
     </form>
@@ -308,12 +342,12 @@
     <h1 class="acct-display">MY LARP</h1>
     <div class="credential">
       <div class="credential-memno" id="cardMemNoBig">LARP-000000</div>
-      <div class="credential-name" id="cardName">—</div>
-      <div class="credential-row"><span class="cred-key">Email</span><span class="cred-val" id="cardEmail">—</span></div>
-      <div class="credential-row"><span class="cred-key">Membership number</span><span class="cred-val" id="cardMemNo">—</span></div>
-      <div class="credential-row"><span class="cred-key">Membership</span><span class="cred-val" id="cardTier">—</span></div>
+      <div class="credential-name" id="cardName">··</div>
+      <div class="credential-row"><span class="cred-key">Email</span><span class="cred-val" id="cardEmail">··</span></div>
+      <div class="credential-row"><span class="cred-key">Membership number</span><span class="cred-val" id="cardMemNo">··</span></div>
+      <div class="credential-row"><span class="cred-key">Membership</span><span class="cred-val" id="cardTier">··</span></div>
       <div class="credential-row"><span class="cred-key">Status</span><span class="cred-val"><span class="status-dot"></span>Active</span></div>
-      <div class="credential-row"><span class="cred-key">Member since</span><span class="cred-val" id="cardSince">—</span></div>
+      <div class="credential-row"><span class="cred-key">Member since</span><span class="cred-val" id="cardSince">··</span></div>
     </div>
     <div class="acct-actions">
       <a href="license.html" class="action is-primary" data-carry-session>
@@ -437,7 +471,7 @@ if(session){
 } else {
   const mode = params.get('mode');
   if(mode === 'register'){
-    if(pendingPlan) document.getElementById('regPlanNote').textContent = 'Selected plan — ' + pendingPlan + ' / ₹' + planPrice(pendingPlan) + ' / yr';
+    if(pendingPlan) document.getElementById('regPlanNote').textContent = 'Selected plan · ' + pendingPlan + ' / ₹' + planPrice(pendingPlan) + ' / yr';
     show('register');
   } else if(mode === 'signin'){
     show('signin');
