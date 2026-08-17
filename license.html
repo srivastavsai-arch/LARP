@@ -83,6 +83,14 @@
   perspective:1400px;
   touch-action:none;
 }
+@media (prefers-reduced-motion: no-preference){
+  .card-outer{animation:cardFloat 4.5s ease-in-out infinite;}
+  .card-outer:has(.card.is-grabbing){animation-play-state:paused;}
+}
+@keyframes cardFloat{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-5px);}
+}
 .card{
   width:100%;height:100%;position:relative;
   transform-style:preserve-3d;
@@ -130,6 +138,10 @@
   max-width:88%;opacity:.75;
 }
 .card-back-tag{font-family:var(--font-mono);font-size:clamp(8.5px,1.7vw,10px);letter-spacing:.1em;text-transform:uppercase;text-align:center;}
+.card-back-url{
+  font-family:var(--font-mono);font-size:clamp(6.5px,1.3vw,8px);
+  letter-spacing:.08em;opacity:.45;text-align:center;
+}
 .card-hint{
   font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
   opacity:.45;margin-top:26px;text-align:center;
@@ -315,6 +327,7 @@ function downloadLicense(){
       '<text x="80" y="'+(h-72)+'" font-family="monospace" font-size="17" letter-spacing="1" opacity="0.7" fill="#000000">'+esc((session.e||''))+'</text>' +
       '<text x="80" y="'+(h-44)+'" font-family="monospace" font-size="26" letter-spacing="5" fill="#000000">LICENSE TO LARP</text>' +
       '<text x="'+(w-80)+'" y="'+(h-44)+'" text-anchor="end" font-family="monospace" font-size="26" letter-spacing="2" fill="#000000">'+esc(session.m)+'</text>' +
+      '<text x="'+(w/2)+'" y="'+(h-18)+'" text-anchor="middle" font-family="monospace" font-size="13" opacity="0.5" fill="#000000">larpme.vercel.app</text>' +
     '</svg>';
   const blob = new Blob([svg], {type:'image/svg+xml'});
   const url = URL.createObjectURL(blob);
@@ -412,10 +425,10 @@ function renderCard(session){
         <p class="license-sub">A CR80 laminate certifying the holder as an official practitioner of LARPing in all forms and fictions.</p>
         <div class="license-actions">
           <button type="button" class="license-action is-primary" id="genLicenseBtn"><span class="dot"></span><span>Generate License</span><span class="arrow">→</span></button>
-          <button type="button" class="license-action" id="flipCardBtn"><span class="dot"></span><span>Flip Card</span><span class="arrow">→</span></button>
+          <button type="button" class="license-action" id="editDetailsBtn"><span class="dot"></span><span>Edit Details</span><span class="arrow">→</span></button>
           <button type="button" class="license-action" id="saveLicenseBtn"><span class="dot"></span><span>Save License</span><span class="arrow">→</span></button>
           <button type="button" class="license-action" id="downloadBtn"><span class="dot"></span><span>Download</span><span class="arrow">→</span></button>
-          <button type="button" class="license-action" id="editDetailsBtn"><span class="dot"></span><span>Edit Details</span><span class="arrow">→</span></button>
+          <button type="button" class="license-action" id="flipCardBtn"><span class="dot"></span><span>Flip Card</span><span class="arrow">→</span></button>
         </div>
         <div class="license-edit" id="licenseEdit" aria-hidden="true">
           <div class="license-edit-inner">
@@ -461,6 +474,7 @@ function renderCard(session){
               </div>
               <div class="card-back-copy">This card certifies the holder as an official practitioner of LARPing in all forms and fictions.</div>
               <div class="card-back-tag">LARP freely. LARP boldly.</div>
+              <div class="card-back-url">larpme.vercel.app</div>
             </div>
           </div>
         </div>
