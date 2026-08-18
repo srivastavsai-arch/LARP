@@ -28,6 +28,9 @@ body{
 }
 img,svg{display:block;max-width:100%;}
 a{color:inherit;text-decoration:none;}
+/* Remove the blue browser tap-highlight box on touch devices.
+   Keyboard focus indication is preserved via :focus-visible below. */
+a,button,input,select,textarea,label,summary{-webkit-tap-highlight-color:transparent;}
 button{font-family:inherit;background:none;border:none;cursor:pointer;color:inherit;}
 input{font-family:inherit;color:inherit;}
 ul{list-style:none;}
