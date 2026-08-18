@@ -90,12 +90,20 @@ body{background:#000;color:var(--gold);}
 
 /* “N is equal to Nice.” — separate, left, subtle */
 .np-nice{
-  position:absolute;left:var(--gutter);bottom:clamp(60px,8vw,88px);
+  position:absolute;left:var(--gutter);right:var(--gutter);bottom:clamp(60px,8vw,88px);
   font-family:var(--font-mono);
   font-size:clamp(8px,0.9vw,10px);
-  letter-spacing:.18em;text-transform:uppercase;
+  letter-spacing:.14em;text-transform:none;
   color:var(--gold);opacity:.55;
   text-align:left;
+  display:flex;align-items:baseline;justify-content:space-between;
+  white-space:nowrap;
+}
+.np-nice-note{
+  font-weight:700;color:#A67C2F;opacity:.85;white-space:nowrap;text-transform:none;
+}
+.np-nice-star{
+  vertical-align:super;font-size:.6em;line-height:1;margin-left:1px;
 }
 .np-micro{
   position:absolute;left:var(--gutter);bottom:clamp(20px,3vw,32px);
@@ -124,7 +132,7 @@ window.LARPMenuOverrides = { faqLink: 'n-pass-faq.html' };
   <h1 class="np-word" id="npWord">N-Word Pass</h1>
   <p class="np-soon" id="npSoon">Coming Soon...</p>
   <a class="np-more" href="n-pass-faq.html">Learn More →</a>
-  <p class="np-nice">N = Nice.</p>
+  <p class="np-nice">N - Nice<span class="np-nice-star">*</span><span class="np-nice-note">*I guess 😏</span></p>
   <p class="np-micro">LARP / N Pass / 08</p>
 </main>
 
