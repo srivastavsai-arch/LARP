@@ -48,6 +48,14 @@
   font-size:clamp(64px,15vw,220px);
   line-height:.95;letter-spacing:.02em;margin-top:clamp(6px,1vw,12px);
 }
+.members-total-line{
+  display:flex;align-items:baseline;gap:clamp(10px,1.5vw,18px);flex-wrap:wrap;
+}
+.members-total-word{
+  font-family:var(--font-mono);font-size:clamp(14px,2.2vw,20px);
+  letter-spacing:.14em;text-transform:uppercase;opacity:.55;
+  padding-bottom:clamp(10px,2vw,30px);
+}
 .members-note{
   font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
   opacity:.55;max-width:44ch;margin-top:clamp(16px,2vw,24px);line-height:1.75;
@@ -99,16 +107,19 @@
 <div id="menu-root" aria-label="Main navigation"></div>
 
 <main class="wrap members-stage">
-  <div class="members-index">06</div>
+  <div class="members-index">05</div>
   <div class="members-micro">
     Member directory <span class="dot"></span>
-    <span class="members-micro-page">Names / 06</span>
+    <span class="members-micro-page">Names / 05</span>
   </div>
   <h1 class="members-display">MEMBERS</h1>
 
   <div class="members-total">
     <span class="members-total-label">Total registered members</span>
-    <span class="members-total-num" id="memberCount">0</span>
+    <span class="members-total-line">
+      <span class="members-total-num" id="memberCount">0</span>
+      <span class="members-total-word">MEMBERS</span>
+    </span>
   </div>
   <p class="members-note">A directory of LARP accounts. Names only — everything else stays private.</p>
 
@@ -140,6 +151,12 @@
   var listEl = document.getElementById('membersList');
   var emptyEl = document.getElementById('membersEmpty');
   var names = [];
+  /* Default seed — shown ONLY while the real public directory is
+     empty or unavailable (rules not yet published, local preview).
+     Real Firestore data always overrides it. Count 7 = these 6 names
+     + 1 more member already on the server. */
+  var SEED_NAMES = ['mokshith', 'adarsh', 'uddish', 'mulanj', 'valuevampire', 'yee'];
+  var SEED_COUNT = 7;
 
   function animateCount(total){
     if(!window.gsap || !countEl || total <= 0){
@@ -173,11 +190,11 @@
     listEl.querySelectorAll('.member-row').forEach(function(r){ io.observe(r); });
   }
 
-  function render(names){
+  function render(names, total){
     if(!names.length){
       listEl.innerHTML = '';
       emptyEl.style.display = 'block';
-      animateCount(0);
+      animateCount(total || 0);
       return;
     }
     emptyEl.style.display = 'none';
@@ -197,15 +214,20 @@
     });
     listEl.innerHTML = '';
     listEl.appendChild(frag);
-    animateCount(names.length);
+    animateCount(total || names.length);
     revealRows();
+  }
+
+  function useSeed(){
+    names = SEED_NAMES.slice();
+    render(names, SEED_COUNT);
   }
 
   var subscribed = false;
   function subscribe(){
     if(subscribed) return;
     if(!window.LarpSession || !window.LarpSession.fbReady() || !window.LarpFirebase){
-      render([]);
+      useSeed();
       return;
     }
     subscribed = true;
@@ -222,9 +244,12 @@
         });
         all.sort(function(a, b){ return a.toLowerCase().localeCompare(b.toLowerCase()); });
         names = all;
-        render(names);
+        /* empty directory (rules not published / backfill not run):
+           fall back to the default seed. Real docs always override. */
+        if(!all.length){ useSeed(); return; }
+        render(all, all.length);
       },
-      function(){ render([]); }
+      function(){ useSeed(); }
     );
   }
 
