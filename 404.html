@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>404 · LARP™</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="StaggeredMenu.css">
+<style>
+:root{--accent:#5227FF;}
+.nf-stage{
+  min-height:100svh;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:calc(var(--nav-h) + clamp(24px,4vw,48px)) var(--gutter) clamp(48px,7vw,96px);
+}
+.nf-micro{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  display:flex;align-items:center;gap:12px;opacity:.6;
+  flex-wrap:wrap;margin-bottom:clamp(32px,5vw,56px);
+}
+.nf-micro .dot{width:7px;height:7px;border-radius:50%;background:var(--black);flex:0 0 7px;}
+.nf-micro-right{margin-left:auto;letter-spacing:.12em;}
+.nf-404{
+  font-family:var(--font-display);
+  font-size:clamp(120px,26vw,400px);
+  line-height:.85;
+  letter-spacing:-.02em;
+  text-transform:uppercase;
+  display:flex;
+  align-items:baseline;
+}
+.nf-char{
+  display:inline-block;
+  overflow:hidden;
+  padding-bottom:.08em;
+  margin-bottom:-.08em;
+}
+.nf-char-inner{display:inline-block;will-change:transform;}
+.nf-track{
+  width:min(560px,100%);
+  height:1px;
+  background:var(--line-strong);
+  position:relative;
+  margin-top:clamp(10px,1.4vw,16px);
+  transform-origin:left center;
+}
+.nf-dot{
+  position:absolute;left:0;top:50%;
+  width:13px;height:13px;border-radius:50%;
+  background:var(--black);
+  transform:translate(-50%,-50%);
+  will-change:transform;
+}
+.nf-lines{
+  margin-top:clamp(28px,4vw,44px);
+  font-family:var(--font-mono);
+  font-size:clamp(11px,1.3vw,13px);
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  opacity:.6;
+  line-height:1.9;
+}
+.nf-line{display:block;}
+.nf-cta{
+  margin-top:clamp(36px,5vw,60px);
+  display:inline-flex;align-items:center;gap:clamp(14px,2vw,22px);
+  font-family:var(--font-mono);font-size:clamp(12px,1.4vw,14px);
+  letter-spacing:.16em;text-transform:uppercase;
+  border-top:1px solid var(--black);
+  border-bottom:1px solid var(--black);
+  padding:clamp(14px,2vw,18px) 0;
+  cursor:pointer;
+  background:transparent;
+  color:var(--black);
+  transition:background .35s var(--ease),color .35s var(--ease);
+  max-width:100%;
+}
+.nf-cta:hover,.nf-cta:focus-visible{
+  background:var(--black);
+  color:var(--white);
+}
+.nf-cta-arrow{
+  display:inline-block;
+  transition:transform .35s var(--ease);
+  font-size:1.15em;
+}
+.nf-cta:hover .nf-cta-arrow{transform:translateX(8px);}
+.nf-foot{
+  position:absolute;left:var(--gutter);bottom:clamp(20px,3vw,32px);
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  opacity:.45;
+}
+.nf-cursor-dot{
+  position:fixed;left:0;top:0;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--black);opacity:.35;
+  pointer-events:none;z-index:900;
+  transform:translate(-50%,-50%);
+  will-change:transform;
+}
+@media (max-width:640px){
+  .nf-micro-right{margin-left:0;}
+  .nf-foot{position:static;margin-top:clamp(36px,6vw,48px);}
+}
+@media (prefers-reduced-motion:reduce){
+  .nf-cta,.nf-cta-arrow{transition:none;}
+}
+</style>
+</head>
+<body>
+
+<div id="menu-root" aria-label="Main navigation"></div>
+
+<main class="wrap nf-stage">
+  <div class="nf-micro">
+    Error <span class="dot"></span>
+    <span>404</span>
+    <span class="nf-micro-right">Page not found</span>
+  </div>
+
+  <h1 class="nf-404" id="nf404" aria-label="404">
+    <span class="nf-char"><span class="nf-char-inner">4</span></span>
+    <span class="nf-char"><span class="nf-char-inner">0</span></span>
+    <span class="nf-char"><span class="nf-char-inner">4</span></span>
+  </h1>
+
+  <div class="nf-track" id="nfTrack" aria-hidden="true">
+    <span class="nf-dot" id="nfDot"></span>
+  </div>
+
+  <p class="nf-lines">
+    <span class="nf-line">You went somewhere</span>
+    <span class="nf-line">that doesn't exist.</span>
+  </p>
+
+  <button class="nf-cta" id="nfCta" type="button">
+    Back to LARP <span class="nf-cta-arrow" aria-hidden="true">→</span>
+  </button>
+
+  <p class="nf-foot">LARP / Error / 404</p>
+</main>
+
+<div class="nf-cursor-dot" id="nfCursorDot" aria-hidden="true"></div>
+
+<script src="app.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-init.js"></script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react" src="StaggeredMenu.jsx"></script>
+<script type="text/babel" data-presets="react" src="menu-mount.jsx"></script>
+
+<script>
+(function(){
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+
+  var cta = document.getElementById('nfCta');
+  cta.addEventListener('click', function(){ location.href = 'index.html'; });
+
+  if(!window.gsap) return;
+
+  var chars = gsap.utils.toArray('.nf-char-inner');
+  var track = document.getElementById('nfTrack');
+  var dot = document.getElementById('nfDot');
+  var lines = gsap.utils.toArray('.nf-line');
+  var micro = document.querySelector('.nf-micro');
+  var code = document.getElementById('nf404');
+
+  if(reduced){
+    gsap.set([micro, chars, track, lines, cta], { clearProps: 'all' });
+    return;
+  }
+
+  var tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+  tl.set(micro, { autoAlpha: 0, y: -10 })
+    .set(lines, { autoAlpha: 0, y: 14 })
+    .set(cta, { autoAlpha: 0, y: 10 })
+    .set(chars, { yPercent: 110 })
+    .set(track, { scaleX: 0 })
+    .set(dot, { x: 0 })
+    .to(micro, { autoAlpha: 0.6, y: 0, duration: 0.5 }, 0)
+    .to(chars, { yPercent: 0, duration: 1.05, stagger: 0.1 }, 0.15)
+    .to(track, { scaleX: 1, duration: 0.8, ease: 'power2.out' }, 0.55)
+    .to(dot, {
+      x: function(){ return Math.max(track.clientWidth - 6, 0); },
+      duration: 1.1, ease: 'power2.inOut'
+    }, 0.6)
+    .to(dot, { scale: 1.45, duration: 0.28, ease: 'power2.inOut', yoyo: true, repeat: 1 }, '-=0.2')
+    .to(lines, { autoAlpha: 0.6, y: 0, duration: 0.7, stagger: 0.12 }, 1.1)
+    .to(cta, { autoAlpha: 1, y: 0, duration: 0.7 }, 1.35);
+
+  /* subtle cursor parallax on the hero (desktop only) */
+  if(finePointer){
+    var stage = document.querySelector('.nf-stage');
+    var cursor = document.getElementById('nfCursorDot');
+    var cx = -100, cy = -100, px = -100, py = -100;
+    stage.addEventListener('mousemove', function(e){
+      var r = stage.getBoundingClientRect();
+      var nx = ((e.clientX - r.left) / r.width) - 0.5;
+      var ny = ((e.clientY - r.top) / r.height) - 0.5;
+      gsap.to(code, { x: nx * -14, duration: 0.9, overwrite: 'auto' });
+      gsap.to(lines, { x: nx * -5, duration: 0.9, overwrite: 'auto' });
+      cx = e.clientX; cy = e.clientY;
+    });
+    gsap.ticker.add(function(){
+      px += (cx - px) * 0.12;
+      py += (cy - py) * 0.12;
+      gsap.set(cursor, { x: px, y: py });
+    });
+    stage.addEventListener('mouseleave', function(){
+      gsap.to(code, { x: 0, duration: 0.8, overwrite: 'auto' });
+      gsap.to(lines, { x: 0, duration: 0.8, overwrite: 'auto' });
+    });
+  } else {
+    document.getElementById('nfCursorDot').style.display = 'none';
+  }
+})();
+</script>
+</body>
+</html>
