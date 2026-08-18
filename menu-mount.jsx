@@ -33,13 +33,14 @@
     }
 
     var items = [
-      { label: 'About', ariaLabel: 'Go to about', link: sec('home') },
+      { label: 'Home', ariaLabel: 'Go to home', link: sec('home') },
       { label: 'Manifesto', ariaLabel: 'Go to the manifesto', link: sec('manifesto') },
-      { label: 'License', ariaLabel: 'View the license', link: toPage('license.html') },
+      { label: 'MyLARP', ariaLabel: 'Go to your account', link: toPage('account.html') },
+      { label: 'My License', ariaLabel: 'View your license', link: toPage('license.html') },
       { label: 'Membership', ariaLabel: 'Go to membership', link: sec('membership') },
       { label: 'FAQ', ariaLabel: 'Go to the FAQ', link: toPage('faq.html') },
-      { label: 'My LARP', ariaLabel: 'Go to your account', link: toPage('account.html') },
-      { label: 'My License', ariaLabel: 'View your license', link: toPage('license.html') }
+      { label: 'Privacy Policy', ariaLabel: 'Read the privacy policy', link: toPage('privacy.html') },
+      { label: 'Disclaimer', ariaLabel: 'Read the disclaimer', link: toPage('disclaimer.html') }
     ];
 
     var accountLink = session ? toPage('account.html') : pageWithMode('account.html', 'signin');
