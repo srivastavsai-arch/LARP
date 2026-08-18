@@ -37,7 +37,6 @@
       { label: 'Manifesto', ariaLabel: 'Go to the manifesto', link: sec('manifesto') },
       { label: 'License', ariaLabel: 'View the license', link: toPage('license.html') },
       { label: 'Membership', ariaLabel: 'Go to membership', link: sec('membership') },
-      { label: 'Members', ariaLabel: 'See the member directory', link: toPage('members.html') },
       { label: 'FAQ', ariaLabel: 'Go to the FAQ', link: toPage('faq.html') },
       { label: 'My LARP', ariaLabel: 'Go to your account', link: toPage('account.html') },
       { label: 'My License', ariaLabel: 'View your license', link: toPage('license.html') }
