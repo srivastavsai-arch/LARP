@@ -2,8 +2,10 @@
 // Mirror of the rules published in Firebase Console → Firestore Database → Rules.
 // Ownership is enforced by Firebase Auth UID: a user can only touch
 // the document in /members/{userId} where userId matches their auth UID.
-// The uid, membership number, tier and member-since date are set at
-// registration and can NEVER be modified by the client afterwards.
+// Guests use Firebase Anonymous Auth, so the same UID ownership applies
+// to them — no rule weakening is needed. The uid, membership number,
+// tier and member-since date are set at registration and can NEVER be
+// modified by the client afterwards.
 
 rules_version = '2';
 service cloud.firestore {
@@ -23,7 +25,7 @@ service cloud.firestore {
                     && request.resource.data.keys().hasOnly([
                       'uid', 'name', 'email', 'membershipNumber',
                       'membershipTier', 'status', 'memberSince',
-                      'createdAt', 'updatedAt'
+                      'age', 'createdAt', 'updatedAt'
                     ]);
 
       allow update: if request.auth != null
@@ -35,7 +37,7 @@ service cloud.firestore {
                     && request.resource.data.keys().hasOnly([
                       'uid', 'name', 'email', 'membershipNumber',
                       'membershipTier', 'status', 'memberSince',
-                      'createdAt', 'updatedAt'
+                      'age', 'createdAt', 'updatedAt'
                     ]);
 
       allow delete: if false;

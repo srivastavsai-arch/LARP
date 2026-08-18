@@ -31,11 +31,9 @@
 
 /* ---------- session store ---------- */
 const LarpSession = (function(){
-  /* mock directory so Sign In has something to match against when
-     Firebase is not configured. Real auth always wins when present. */
-  const DEMO_DIRECTORY = [
-    { e:'demo@larp.club', n:'A. Pretender', m:'LARP-000001', t:'LARP', d:'2025' }
-  ];
+  function current(){
+    return memory;
+  }
 
   function readFromUrl(url){
     const params = new URLSearchParams(url || location.search);
@@ -45,7 +43,8 @@ const LarpSession = (function(){
       e: params.get('e') || '',
       m: params.get('m') || '',
       t: params.get('t') || 'LARP',
-      d: params.get('d') || ''
+      d: params.get('d') || '',
+      age: params.get('age') || ''
     };
   }
 
@@ -56,6 +55,7 @@ const LarpSession = (function(){
     if(session.m) p.set('m', session.m);
     if(session.t) p.set('t', session.t);
     if(session.d) p.set('d', session.d);
+    if(session.age) p.set('age', session.age);
     return p;
   }
 
@@ -65,14 +65,6 @@ const LarpSession = (function(){
 
   function current(){
     return memory;
-  }
-
-  function findByEmail(email){
-    const norm = (email||'').trim().toLowerCase();
-    if(!norm) return null;
-    if(memory && memory.e && memory.e.toLowerCase() === norm) return memory;
-    const match = DEMO_DIRECTORY.find(d=>d.e.toLowerCase() === norm);
-    return match ? {...match} : null;
   }
 
   function generateMembershipNo(){
@@ -87,7 +79,7 @@ const LarpSession = (function(){
 
   /* when Firebase is live, member data NEVER rides in the URL:
      links stay clean and the URL is never a source of truth. */
-  const URL_SESSION_KEYS = ['n','e','m','t','d'];
+  const URL_SESSION_KEYS = ['n','e','m','t','d','age'];
 
   function stripSessionParamsFromUrl(){
     if(!location.search) return;
@@ -176,7 +168,8 @@ const LarpSession = (function(){
       m: d.membershipNumber || d.membershipNo || '',
       t: d.membershipTier || d.tier || 'LARP',
       d: d.memberSince || '',
-      s: d.status || 'Active'
+      s: d.status || 'Active',
+      age: d.age || ''
     };
   }
 
@@ -190,39 +183,108 @@ const LarpSession = (function(){
       membershipTier: m.t,
       status: m.s || 'Active',
       memberSince: m.d,
+      age: m.age || '',
       createdAt: m.createdAt || now,
       updatedAt: now
     };
   }
 
-  async function createMember(opts){
-    if(!fbReady()) return null;
-    const F = window.LarpFirebase;
-    const cred = await F.auth.createUserWithEmailAndPassword(opts.email, opts.password);
-    const uid = cred.user.uid;
-    /* check members/{uid} before creating: if a record already
-       exists (e.g. sign-in raced with the auth listener), load it.
-       The membership number is generated exactly once, only here. */
-    const existing = await F.db.collection('members').doc(uid).get();
-    if(existing.exists) return memberDataFromDoc(existing.data());
-    const m = {
-      n: opts.name, e: opts.email,
+  /* ---------- local guest identity (fallback) ----------
+     Used only when Firebase is absent or the Anonymous provider is
+     disabled: the guest still gets a persistent identity and license,
+     stored in localStorage so it survives refreshes and is never
+     duplicated. Dropped automatically once real auth exists. */
+  const LOCAL_GUEST_KEY = 'larp_guest_v1';
+
+  function loadLocalGuest(){
+    try{
+      const raw = window.localStorage.getItem(LOCAL_GUEST_KEY);
+      if(!raw) return null;
+      const s = JSON.parse(raw);
+      if(s && s.m && s.guest) return s;
+    }catch(err){}
+    return null;
+  }
+
+  function saveLocalGuest(session){
+    try{ window.localStorage.setItem(LOCAL_GUEST_KEY, JSON.stringify(session)); }catch(err){}
+  }
+
+  function clearLocalGuest(){
+    try{ window.localStorage.removeItem(LOCAL_GUEST_KEY); }catch(err){}
+  }
+
+  function localGuestMember(opts){
+    const existing = loadLocalGuest();
+    const m = existing && existing.m ? existing : {
+      n:'', e:'',
       m: generateMembershipNo(),
       t: opts.tier || 'LARP',
       d: memberSinceLabel(),
-      s: 'Active'
+      s: 'Active',
+      guest: true
     };
-    await F.db.collection('members').doc(uid).set(memberDocPayload(uid, m));
+    if(opts.name){ m.n = opts.name; m.age = opts.age || m.age; }
+    saveLocalGuest(m);
     return m;
   }
 
-  async function signInWithEmail(email, password){
-    if(!fbReady()) return null;
+  /* Guest flow: Firebase Anonymous Auth is the primary identity — the
+     guest gets a persistent UID, the same member/license record is
+     restored on every refresh, and records are checked before creation
+     so a returning guest is never duplicated. If the Anonymous
+     provider is not enabled, fall back to the persistent local guest
+     identity above so the flow still completes end to end. */
+  async function createGuest(opts){
+    if(!fbReady()) return localGuestMember(opts);
     const F = window.LarpFirebase;
-    const cred = await F.auth.signInWithEmailAndPassword(email, password);
-    const doc = await F.db.collection('members').doc(cred.user.uid).get();
-    if(!doc.exists) return null;
-    return memberDataFromDoc(doc.data());
+    try{
+      let user = F.auth.currentUser;
+      if(!user){
+        const cred = await F.auth.signInAnonymously();
+        user = cred.user;
+      }
+      const uid = user.uid;
+      /* check members/{uid} before creating: if a record already
+         exists (returning guest, or a signed-in member who chose the
+         guest path), load it. The membership number is generated
+         exactly once, only here. */
+      const existing = await F.db.collection('members').doc(uid).get();
+      if(existing.exists){
+        const data = existing.data();
+        const member = memberDataFromDoc(data);
+        if(opts.name && (data.name !== opts.name || String(data.age||'') !== String(opts.age||''))){
+          await F.db.collection('members').doc(uid).update({
+            name: opts.name,
+            age: opts.age,
+            updatedAt: new Date().toISOString()
+          });
+          member.n = opts.name;
+          member.age = opts.age;
+        }
+        clearLocalGuest();
+        return member;
+      }
+      const m = {
+        n: opts.name, e: '',
+        m: generateMembershipNo(),
+        t: opts.tier || 'LARP',
+        d: memberSinceLabel(),
+        s: 'Active',
+        age: opts.age || ''
+      };
+      await F.db.collection('members').doc(uid).set(memberDocPayload(uid, m));
+      clearLocalGuest();
+      return m;
+    }catch(err){
+      /* Anonymous provider disabled: this is the only Firebase-supported
+         client-side guest mechanism, so fall back to the persistent
+         local identity instead of surfacing an admin-restricted error. */
+      if(err && (err.code === 'auth/admin-restricted-operation' || err.code === 'auth/operation-not-allowed')){
+        return localGuestMember(opts);
+      }
+      throw err;
+    }
   }
 
   async function signInWithGoogle(){
@@ -286,6 +348,7 @@ const LarpSession = (function(){
     F.auth.onAuthStateChanged(async function(user){
       try{
         if(user){
+          clearLocalGuest();
           const doc = await F.db.collection('members').doc(user.uid).get();
           if(doc.exists){
             /* existing member: load their record. NEVER re-create
@@ -294,10 +357,12 @@ const LarpSession = (function(){
             set(member);
           }
           /* authenticated but no record yet: creation happens exactly
-             once inside createMember / signInWithGoogle, so the
+             once inside createGuest / signInWithGoogle, so the
              membership number is never generated twice. */
         } else {
-          set(null);
+          /* no auth user: restore a persistent local guest identity
+             if one exists, so a fallback guest survives refreshes */
+          set(loadLocalGuest());
         }
       }catch(err){
         /* silent: never log member data */
@@ -305,7 +370,7 @@ const LarpSession = (function(){
     });
   }
 
-  return { current, findByEmail, generateMembershipNo, memberSinceLabel, propagateToLinks, toParams, fbReady, createMember, signInWithEmail, signInWithGoogle, updateMember, signOut, set, clear, onChange, watchAuth, onFirebaseReady };
+  return { current, generateMembershipNo, memberSinceLabel, propagateToLinks, toParams, fbReady, createGuest, signInWithGoogle, updateMember, signOut, set, clear, onChange, watchAuth, onFirebaseReady };
 })();
 
 window.LarpSession = LarpSession;
