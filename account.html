@@ -119,39 +119,6 @@
 .google-g svg{width:100%;height:100%;display:block;}
 .google-btn:hover .google-g svg path{fill:#fff;}
 
-/* guest license: generate without an account */
-.guest-block{margin-top:clamp(20px,3.5vw,32px);}
-.guest-btn{
-  width:100%;display:flex;align-items:center;justify-content:center;gap:12px;
-  padding:clamp(14px,2.4vw,18px) 18px;border:1px solid var(--black);border-radius:999px;
-  background:var(--white);color:var(--black);
-  font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;
-  cursor:pointer;transition:background .3s var(--ease),color .3s var(--ease),transform .3s var(--ease),box-shadow .3s var(--ease);
-}
-.guest-btn:hover{background:var(--black);color:var(--white);transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.16);}
-.guest-btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
-.guest-form{margin-top:16px;padding-top:clamp(16px,2.5vw,22px);border-top:1px solid var(--line);}
-.guest-actions{display:flex;align-items:center;gap:22px;margin-top:16px;}
-.guest-go{
-  display:inline-flex;align-items:center;gap:14px;
-  font-family:var(--font-display);font-size:clamp(26px,5vw,44px);text-transform:uppercase;letter-spacing:-.01em;
-  border:none;border-bottom:2px solid var(--black);background:none;color:inherit;cursor:pointer;padding:6px 2px;
-  transition:gap .35s var(--ease),border-color .3s,color .3s;
-}
-.guest-go:hover{gap:22px;color:var(--accent);border-color:var(--accent);}
-.guest-go:disabled{opacity:.4;cursor:default;}
-.guest-cancel{
-  font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
-  background:none;border:none;padding:4px 0;color:inherit;opacity:.5;cursor:pointer;
-}
-.guest-cancel:hover{opacity:1;}
-
-/* subtle note under the Google option: no charge implied */
-.google-note{
-  font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;
-  opacity:.4;margin-top:12px;text-align:center;display:block;
-}
-
 .acct-submit{
   display:inline-flex;align-items:center;gap:14px;margin-top:clamp(20px,3.5vw,32px);
   font-family:var(--font-display);font-size:clamp(26px,5vw,44px);text-transform:uppercase;letter-spacing:-.01em;
@@ -289,38 +256,33 @@
     <div class="acct-micro">Become a member <span class="dot"></span> <span class="acct-micro-page">Step / 03</span></div>
     <h1 class="acct-display">Become a<br>member.</h1>
     <form class="acct-form" id="registerForm">
-      <div class="guest-block" role="presentation">
-        <button type="button" class="guest-btn" aria-label="Generate a license without signing in">
-          <span class="guest-label">Continue Without Signing In</span>
-        </button>
-        <div class="guest-form" hidden>
-          <div class="acct-field">
-            <label class="field-label" for="regGuestName"><span class="dot"></span>Your name</label>
-            <input class="field-input guest-input" id="regGuestName" type="text" placeholder="Enter your name" autocomplete="name" maxlength="60">
-          </div>
-          <div class="acct-field">
-            <label class="field-label" for="regGuestAge"><span class="dot"></span>Your age</label>
-            <input class="field-input guest-age" id="regGuestAge" type="number" min="1" max="120" inputmode="numeric" placeholder="Enter your age" autocomplete="off">
-            <span class="field-error guest-age-error" id="regGuestAgeError" style="display:none;">Only 13+ users are allowed.</span>
-          </div>
-          <div class="guest-actions">
-            <button type="button" class="guest-go">Continue →</button>
-            <button type="button" class="guest-cancel">Cancel</button>
-          </div>
-          <span class="field-error guest-error" id="regGuestError" style="display:none;"></span>
-        </div>
-      </div>
       <div class="google-block" role="presentation">
-        <div class="google-or"><span>or</span></div>
         <button type="button" class="google-btn" aria-label="Continue with Google">
           <span class="google-g" aria-hidden="true">
             <svg viewBox="0 0 48 48"><path fill="#000" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#000" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#000" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#000" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
           </span>
           <span class="google-label">Continue with Google</span>
         </button>
-        <span class="google-note">(Save your details so you don't have to sign in repeatedly.)</span>
+        <div class="google-or"><span>or</span></div>
       </div>
+      <div class="acct-field">
+        <label class="field-label" for="regName"><span class="dot"></span>Full name</label>
+        <input class="field-input" id="regName" name="name" type="text" placeholder="Your name" autocomplete="name" required>
+      </div>
+      <div class="acct-field">
+        <label class="field-label" for="regEmail"><span class="dot"></span>Email</label>
+        <input class="field-input" id="regEmail" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+      </div>
+      <div class="acct-field">
+        <label class="field-label" for="regPassword"><span class="dot"></span>Password</label>
+        <input class="field-input" id="regPassword" name="password" type="password" placeholder="Create a password" autocomplete="new-password" required>
+      </div>
+      <button type="submit" class="acct-submit">
+        Continue
+        <span class="arrow">→</span>
+      </button>
       <span class="field-note" id="regPlanNote"></span>
+      <span class="field-error" id="regError" style="display:none;"></span>
     </form>
   </section>
 
@@ -331,50 +293,53 @@
     <div class="acct-micro">Welcome back <span class="dot"></span> <span class="acct-micro-page">Step / 04</span></div>
     <h1 class="acct-display">Welcome<br>back.</h1>
     <form class="acct-form" id="signinForm">
-      <div class="guest-block" role="presentation">
-        <button type="button" class="guest-btn" aria-label="Generate a license without signing in">
-          <span class="guest-label">Continue Without Signing In</span>
-        </button>
-        <div class="guest-form" hidden>
-          <div class="acct-field">
-            <label class="field-label" for="signGuestName"><span class="dot"></span>Your name</label>
-            <input class="field-input guest-input" id="signGuestName" type="text" placeholder="Enter your name" autocomplete="name" maxlength="60">
-          </div>
-          <div class="acct-field">
-            <label class="field-label" for="signGuestAge"><span class="dot"></span>Your age</label>
-            <input class="field-input guest-age" id="signGuestAge" type="number" min="1" max="120" inputmode="numeric" placeholder="Enter your age" autocomplete="off">
-            <span class="field-error guest-age-error" id="signGuestAgeError" style="display:none;">Only 13+ users are allowed.</span>
-          </div>
-          <div class="guest-actions">
-            <button type="button" class="guest-go">Continue →</button>
-            <button type="button" class="guest-cancel">Cancel</button>
-          </div>
-          <span class="field-error guest-error" id="signGuestError" style="display:none;"></span>
-        </div>
-      </div>
       <div class="google-block" role="presentation">
-        <div class="google-or"><span>or</span></div>
         <button type="button" class="google-btn" aria-label="Sign in with Google">
           <span class="google-g" aria-hidden="true">
             <svg viewBox="0 0 48 48"><path fill="#000" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#000" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#000" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#000" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
           </span>
           <span class="google-label">Sign in with Google</span>
         </button>
-        <span class="google-note">(Save your details so you don't have to sign in repeatedly.)</span>
+        <div class="google-or"><span>or</span></div>
       </div>
-      <span class="field-note">Google members return automatically. Guests keep their license on this device.</span>
+      <div class="acct-field">
+        <label class="field-label" for="signEmail"><span class="dot"></span>Email</label>
+        <input class="field-input" id="signEmail" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+      </div>
+      <div class="acct-field">
+        <label class="field-label" for="signPassword"><span class="dot"></span>Password</label>
+        <input class="field-input" id="signPassword" name="password" type="password" placeholder="Your password" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="acct-submit">
+        Continue
+        <span class="arrow">→</span>
+      </button>
+      <span class="field-note">Sign in with the email and password you registered with.</span>
+      <span class="field-error" id="signError" style="display:none;"></span>
     </form>
+  </section>
+
+  <!-- MEMBER NOT FOUND -->
+  <section class="acct-view" id="view-notfound">
+    <div class="acct-index">05</div>
+    <a href="#" class="acct-back" data-goto="signin">← Sign in</a>
+    <div class="acct-micro">Sign in <span class="dot"></span> <span class="acct-micro-page">Error / 05</span></div>
+    <h1 class="acct-display">Member<br>not found.</h1>
+    <p class="page-sub" style="max-width:380px;margin-top:18px;">There's no LARP account under that email yet. You can register for free in seconds.</p>
+    <div style="margin-top:clamp(28px,5vw,44px);">
+      <a href="#" class="acct-submit" data-goto="register">Register for Free <span class="arrow">→</span></a>
+    </div>
   </section>
 
   <!-- WELCOME (post-registration) -->
   <section class="acct-view" id="view-welcome">
     <div class="acct-index">02</div>
     <div class="acct-micro">Welcome to LARP <span class="dot"></span> <span class="acct-micro-page">Issued / 02</span></div>
-    <h1 class="acct-display" id="welcomeTitle">MEMBER</h1>
+    <h1 class="acct-display">MEMBER</h1>
     <div class="welcome-memno" id="welcomeMemNo">LARP-000000</div>
-    <p class="welcome-sub" id="welcomeSub">Welcome to LARP.<br>Your license is one step away.</p>
+    <p class="welcome-sub">Welcome to LARP.<br>Your license is one step away.</p>
     <div>
-      <a href="#" class="acct-submit" id="welcomeCta" data-goto="mylarp">My LARP <span class="arrow">→</span></a>
+      <a href="#" class="acct-submit" data-goto="mylarp">My LARP <span class="arrow">→</span></a>
     </div>
   </section>
 
@@ -524,6 +489,27 @@ function planPrice(tier){
   return '2,000';
 }
 
+function registerError(err){
+  const code = err && err.code;
+  if(code === 'auth/email-already-in-use') return 'That email is already registered. Sign in instead.';
+  if(code === 'auth/weak-password') return 'Password too weak. Use at least 6 characters.';
+  if(code === 'auth/invalid-email') return 'That email address looks invalid.';
+  if(code === 'auth/operation-not-allowed') return 'Email/password sign-up is not enabled. Enable it in Firebase console → Authentication → Sign-in method.';
+  if(code === 'auth/too-many-requests') return 'Too many attempts. Try again in a moment.';
+  if(code === 'auth/network-request-failed') return 'Network error. Check your connection and try again.';
+  return 'Could not register. Please try again.';
+}
+
+function signInError(err){
+  const code = err && err.code;
+  if(code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') return 'Email or password is incorrect.';
+  if(code === 'auth/invalid-email') return 'That email address looks invalid.';
+  if(code === 'auth/operation-not-allowed') return 'Email/password sign-in is not enabled. Enable it in Firebase console → Authentication → Sign-in method.';
+  if(code === 'auth/too-many-requests') return 'Too many attempts. Try again in a moment.';
+  if(code === 'auth/network-request-failed') return 'Network error. Check your connection and try again.';
+  return 'Sign in failed. Please try again.';
+}
+
 function googleError(err){
   const code = err && err.code;
   if(code === 'auth/popup-closed-by-user') return 'Sign-in cancelled.';
@@ -571,7 +557,7 @@ if(session){
 } else {
   const mode = params.get('mode');
   if(mode === 'register'){
-    if(pendingPlan) document.getElementById('regPlanNote').textContent = 'Selected plan · ' + pendingPlan;
+    if(pendingPlan) document.getElementById('regPlanNote').textContent = 'Selected plan · ' + pendingPlan + ' / ₹' + planPrice(pendingPlan) + ' / yr';
     show('register');
   } else if(mode === 'signin'){
     show('signin');
@@ -586,6 +572,66 @@ document.querySelectorAll('[data-goto]').forEach(el=>{
     e.preventDefault();
     show(el.getAttribute('data-goto'));
   });
+});
+
+/* ---- register ---- */
+document.getElementById('registerForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const errEl = document.getElementById('regError');
+  errEl.style.display = 'none';
+  if(!name || !email || !password) return;
+  autoNavBlocked = true;
+  try{
+    if(LarpSession.fbReady()){
+      session = await LarpSession.createMember({ name, email, password, tier: pendingPlan });
+      if(!session) throw new Error('Firebase is not configured yet.');
+    } else {
+      session = {
+        n:name, e:email,
+        m:LarpSession.generateMembershipNo(),
+        t:pendingPlan,
+        d:LarpSession.memberSinceLabel(),
+        s:'Active'
+      };
+    }
+    welcomeShownFor = session.m;
+    pushSessionToUrl();
+    fillCredential();
+    document.getElementById('welcomeMemNo').textContent = session.m;
+    show('welcome');
+  }catch(err){
+    autoNavBlocked = false;
+    errEl.textContent = registerError(err);
+    errEl.style.display = 'block';
+  }
+});
+
+/* ---- sign in ---- */
+document.getElementById('signinForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const email = document.getElementById('signEmail').value.trim();
+  const password = document.getElementById('signPassword').value;
+  const errEl = document.getElementById('signError');
+  errEl.style.display = 'none';
+  try{
+    if(LarpSession.fbReady()){
+      session = await LarpSession.signInWithEmail(email, password);
+      if(!session) throw new Error('No member record found for that account.');
+    } else {
+      const found = LarpSession.findByEmail(email);
+      if(!found){ show('notfound'); return; }
+      session = found;
+    }
+    pushSessionToUrl();
+    fillCredential();
+    show('mylarp');
+  }catch(err){
+    errEl.textContent = signInError(err);
+    errEl.style.display = 'block';
+  }
 });
 
 /* ---- google sign in (real when Firebase is configured) ---- */
@@ -605,118 +651,6 @@ document.querySelectorAll('.google-btn').forEach(btn=>{
     }
   });
 });
-
-/* ---- continue without signing in (guest license) ---- */
-function guestError(err){
-  const code = err && err.code;
-  if(code === 'guest-quota' || code === 'permission-denied') return 'This device already generated its guest license. Sign in to mint another.';
-  if(code === 'guest-name') return 'Enter your name to continue.';
-  if(code === 'guest-age') return 'Only 13+ users are allowed.';
-  if(code === 'auth/network-request-failed') return 'Network error. Check your connection and try again.';
-  return 'Could not generate your license. Please try again.';
-}
-
-function setWelcome(guest){
-  document.getElementById('welcomeTitle').textContent = guest ? 'GUEST' : 'MEMBER';
-  document.getElementById('welcomeSub').innerHTML = guest
-    ? 'Your guest license.<br>Sign in to keep it forever.'
-    : 'Welcome to LARP.<br>Your license is one step away.';
-  const cta = document.getElementById('welcomeCta');
-  if(guest){
-    cta.removeAttribute('data-goto');
-    cta.href = 'index.html';
-    cta.innerHTML = 'Back to LARP <span class="arrow">→</span>';
-  } else {
-    cta.setAttribute('data-goto','mylarp');
-    cta.href = '#';
-    cta.innerHTML = 'My LARP <span class="arrow">→</span>';
-  }
-}
-
-document.querySelectorAll('.guest-block').forEach(block=>{
-  const btn = block.querySelector('.guest-btn');
-  const form = block.querySelector('.guest-form');
-  const nameInput = block.querySelector('.guest-input');
-  const ageInput = block.querySelector('.guest-age');
-  const ageErrEl = block.querySelector('.guest-age-error');
-  const errEl = block.querySelector('.guest-error');
-  const cancel = block.querySelector('.guest-cancel');
-  const go = block.querySelector('.guest-go');
-  btn.addEventListener('click', ()=>{
-    const open = form.hasAttribute('hidden');
-    form.hidden = !open;
-    if(!open){ errEl.style.display = 'none'; ageErrEl.style.display = 'none'; nameInput.focus(); }
-  });
-  cancel.addEventListener('click', ()=>{
-    form.hidden = true; errEl.style.display = 'none'; ageErrEl.style.display = 'none';
-  });
-  ageInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); go.click(); } });
-  nameInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); ageInput.focus(); } });
-  go.addEventListener('click', async ()=>{
-    errEl.style.display = 'none';
-    ageErrEl.style.display = 'none';
-    const name = nameInput.value.trim();
-    if(!name){ errEl.textContent = 'Enter your name to continue.'; errEl.style.display = 'block'; nameInput.focus(); return; }
-    const age = parseInt(ageInput.value, 10);
-    if(isNaN(age)){
-      ageErrEl.textContent = 'Enter your age to continue.';
-      ageErrEl.style.display = 'block'; ageInput.focus(); return;
-    }
-    if(age < 13){
-      ageErrEl.textContent = 'Only 13+ users are allowed.';
-      ageErrEl.style.display = 'block'; ageInput.focus(); return;
-    }
-    go.disabled = true;
-    try{
-      const g = await LarpSession.generateGuestLicense(name, age);
-      welcomeShownFor = 'guest';
-      setWelcome(true);
-      document.getElementById('welcomeMemNo').textContent = g.m;
-      show('welcome');
-    }catch(err){
-      go.disabled = false;
-      if(err && err.code === 'guest-age'){
-        ageErrEl.textContent = 'Only 13+ users are allowed.';
-        ageErrEl.style.display = 'block';
-      } else {
-        errEl.textContent = guestError(err);
-        errEl.style.display = 'block';
-      }
-    }
-  });
-});
-
-/* restore a guest after refresh / reopen: the anonymous UID comes
-   back from Firebase auth, and the license + quota usage come from
-   the server-side guest record, so the guest is never forgotten */
-(function restoreGuest(){
-  if(LarpSession.fbReady()){
-    const F = window.LarpFirebase;
-    let done = false;
-    F.auth.onAuthStateChanged(async function(user){
-      if(done) return;
-      if(!user || !user.isAnonymous) return;
-      done = true;
-      try{
-        if(welcomeShownFor) return;
-        const g = await LarpSession.currentGuest();
-        if(!g) return;
-        welcomeShownFor = 'guest';
-        setWelcome(true);
-        document.getElementById('welcomeMemNo').textContent = g.m;
-        show('welcome');
-      }catch(err){}
-    });
-  } else {
-    LarpSession.currentGuest().then(function(g){
-      if(!g || welcomeShownFor) return;
-      welcomeShownFor = 'guest';
-      setWelcome(true);
-      document.getElementById('welcomeMemNo').textContent = g.m;
-      show('welcome');
-    });
-  }
-})();
 
 /* ---- edit profile ---- */
 document.querySelectorAll('[data-goto="edit"]').forEach(el=>{
