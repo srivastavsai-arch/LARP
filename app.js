@@ -31,11 +31,6 @@
 
 /* ---------- session store ---------- */
 const LarpSession = (function(){
-  /* mock directory so Sign In has something to match against when
-     Firebase is not configured. Real auth always wins when present. */
-  const DEMO_DIRECTORY = [
-    { e:'demo@larp.club', n:'A. Pretender', m:'LARP-000001', t:'LARP', d:'2025' }
-  ];
 
   function readFromUrl(url){
     const params = new URLSearchParams(url || location.search);
@@ -65,14 +60,6 @@ const LarpSession = (function(){
 
   function current(){
     return memory;
-  }
-
-  function findByEmail(email){
-    const norm = (email||'').trim().toLowerCase();
-    if(!norm) return null;
-    if(memory && memory.e && memory.e.toLowerCase() === norm) return memory;
-    const match = DEMO_DIRECTORY.find(d=>d.e.toLowerCase() === norm);
-    return match ? {...match} : null;
   }
 
   function generateMembershipNo(){
@@ -195,42 +182,13 @@ const LarpSession = (function(){
     };
   }
 
-  async function createMember(opts){
-    if(!fbReady()) return null;
-    const F = window.LarpFirebase;
-    const cred = await F.auth.createUserWithEmailAndPassword(opts.email, opts.password);
-    const uid = cred.user.uid;
-    /* check members/{uid} before creating: if a record already
-       exists (e.g. sign-in raced with the auth listener), load it.
-       The membership number is generated exactly once, only here. */
-    const existing = await F.db.collection('members').doc(uid).get();
-    if(existing.exists) return memberDataFromDoc(existing.data());
-    const m = {
-      n: opts.name, e: opts.email,
-      m: generateMembershipNo(),
-      t: opts.tier || 'LARP',
-      d: memberSinceLabel(),
-      s: 'Active'
-    };
-    await F.db.collection('members').doc(uid).set(memberDocPayload(uid, m));
-    return m;
-  }
-
-  async function signInWithEmail(email, password){
-    if(!fbReady()) return null;
-    const F = window.LarpFirebase;
-    const cred = await F.auth.signInWithEmailAndPassword(email, password);
-    const doc = await F.db.collection('members').doc(cred.user.uid).get();
-    if(!doc.exists) return null;
-    return memberDataFromDoc(doc.data());
-  }
-
   async function signInWithGoogle(){
     if(!fbReady()) return null;
     const F = window.LarpFirebase;
     const cred = await F.auth.signInWithPopup(F.google);
     const uid = cred.user.uid;
-    const doc = await F.db.collection('members').doc(uid).get();
+    const ref = F.db.collection('members').doc(uid);
+    const doc = await ref.get();
     if(doc.exists) return memberDataFromDoc(doc.data());
     const m = {
       n: cred.user.displayName || (cred.user.email||'').split('@')[0] || 'Member',
@@ -240,7 +198,17 @@ const LarpSession = (function(){
       d: memberSinceLabel(),
       s: 'Active'
     };
-    await F.db.collection('members').doc(uid).set(memberDocPayload(uid, m));
+    const payload = memberDocPayload(uid, m);
+    await F.db.runTransaction(async t=>{
+      const fresh = await t.get(ref);
+      if(fresh.exists) return;
+      await t.set(ref, payload);
+      const cntRef = F.db.collection('counters').doc('members');
+      const cnt = await t.get(cntRef);
+      const next = (cnt.exists ? cnt.data().value : 0) + 1;
+      if(cnt.exists) await t.update(cntRef, { value: next });
+      else await t.set(cntRef, { value: next });
+    });
     return m;
   }
 
@@ -294,8 +262,8 @@ const LarpSession = (function(){
             set(member);
           }
           /* authenticated but no record yet: creation happens exactly
-             once inside createMember / signInWithGoogle, so the
-             membership number is never generated twice. */
+             once inside signInWithGoogle (transaction + counter), so
+             the membership number is never generated twice. */
         } else {
           set(null);
         }
@@ -305,7 +273,87 @@ const LarpSession = (function(){
     });
   }
 
-  return { current, findByEmail, generateMembershipNo, memberSinceLabel, propagateToLinks, toParams, fbReady, createMember, signInWithEmail, signInWithGoogle, updateMember, signOut, set, clear, onChange, watchAuth, onFirebaseReady };
+  /* ---------- guest license (no account) ----------
+     Identity: Firebase anonymous auth. The anonymous UID persists
+     across refresh/reopen (token lives in the browser), so the
+     guest is never forgotten and can never mint a second identity.
+     Quota is enforced twice: the client pre-checks for UX, and
+     Firestore rules are the hard cap (monotonic quotaUsed, frozen
+     identity fields, uid == auth uid, quota cap in the rules file). */
+  const GUEST_QUOTA = 1; /* keep in sync with the /guests rules cap */
+  const MOCK_GUEST_KEY = 'larp-guest';
+
+  function readMockGuest(){
+    try{ return JSON.parse(localStorage.getItem(MOCK_GUEST_KEY) || 'null'); }catch(err){ return null; }
+  }
+  function saveMockGuest(g){
+    try{ localStorage.setItem(MOCK_GUEST_KEY, JSON.stringify(g)); }catch(err){}
+  }
+
+  async function generateGuestLicense(name, age){
+    const clean = String(name || '').trim();
+    const ageNum = parseInt(age, 10);
+    if(!clean) throw { code: 'guest-name' };
+    if(isNaN(ageNum) || ageNum < 13) throw { code: 'guest-age' };
+    if(!fbReady()){
+      const existing = readMockGuest();
+      if(existing) throw { code: 'guest-quota' };
+      const mock = { uid:'mock-' + Math.random().toString(36).slice(2,10), n:clean, a:ageNum, m:generateMembershipNo(), q:GUEST_QUOTA, qU:1 };
+      saveMockGuest(mock);
+      return { n:mock.n, m:mock.m };
+    }
+    const F = window.LarpFirebase;
+    const cred = await F.auth.signInAnonymously();
+    const uid = cred.user.uid;
+    const ref = F.db.collection('guests').doc(uid);
+    const doc = await ref.get();
+    const now = new Date().toISOString();
+    if(doc.exists){
+      const g = doc.data();
+      if((g.quotaUsed || 0) >= (g.quota || GUEST_QUOTA)) throw { code: 'guest-quota' };
+      await ref.update({
+        uid, name:g.name, licenseNo:g.licenseNo, age:g.age,
+        quota:g.quota, quotaUsed:(g.quotaUsed || 0) + 1,
+        createdAt:g.createdAt, updatedAt:now
+      });
+      return { n:g.name, m:g.licenseNo };
+    }
+    /* guest record + member counter, atomically in one transaction:
+       the count is exact and a refresh can never double-count */
+    const licenseNo = generateMembershipNo();
+    const payload = {
+      uid, name:clean, licenseNo, age:ageNum,
+      quota:GUEST_QUOTA, quotaUsed:1,
+      createdAt:now, updatedAt:now
+    };
+    await F.db.runTransaction(async t=>{
+      const fresh = await t.get(ref);
+      if(fresh.exists) return;
+      await t.set(ref, payload);
+      const cntRef = F.db.collection('counters').doc('members');
+      const cnt = await t.get(cntRef);
+      const next = (cnt.exists ? cnt.data().value : 0) + 1;
+      if(cnt.exists) await t.update(cntRef, { value: next });
+      else await t.set(cntRef, { value: next });
+    });
+    return { n:clean, m:licenseNo };
+  }
+
+  async function currentGuest(){
+    if(!fbReady()){
+      const g = readMockGuest();
+      return g ? { n:g.n, m:g.m, quotaUsed:g.qU, quota:g.q } : null;
+    }
+    const F = window.LarpFirebase;
+    const user = F.auth.currentUser;
+    if(!user || !user.isAnonymous) return null;
+    const doc = await F.db.collection('guests').doc(user.uid).get();
+    if(!doc.exists) return null;
+    const g = doc.data();
+    return { n:g.name, m:g.licenseNo, quotaUsed:g.quotaUsed, quota:g.quota };
+  }
+
+  return { current, generateMembershipNo, memberSinceLabel, propagateToLinks, toParams, fbReady, signInWithGoogle, updateMember, signOut, set, clear, onChange, watchAuth, onFirebaseReady, generateGuestLicense, currentGuest, GUEST_QUOTA };
 })();
 
 window.LarpSession = LarpSession;
