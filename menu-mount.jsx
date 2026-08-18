@@ -73,7 +73,7 @@
       changeMenuColorOnOpen: true,
       colors: ['#B497CF', '#5227FF'],
       logoUrl: 'larp-logo.svg',
-      faqLink: toPage('faq.html'),
+      faqLink: toPage((window.LARPMenuOverrides && window.LARPMenuOverrides.faqLink) || 'faq.html'),
       accountLink: accountLink,
       accountLabel: accountLabel,
       homeLink: toPage('index.html'),

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>N Pass · LARP™</title>
+<meta name="description" content="N Word Pass. Coming soon.">
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="StaggeredMenu.css">
+<style>
+/* page-wide refined gold system: one warm metallic tone */
+:root{--gold:#D4AF37;}
+html,body{background:#000;color:var(--gold);}
+body{background:#000;color:var(--gold);}
+
+/* top controls: black background + refined gold */
+.sm-logo-img{filter:none;}
+.staggered-menu-wrapper[data-open] .sm-logo-img{filter:brightness(0) !important;}
+.nav-faq,.nav-account{color:var(--gold) !important;}
+.nav-faq-q,.nav-acct-circle,.sm-toggle{
+  background:#000 !important;
+  border-color:rgba(212,175,55,.45) !important;
+  color:var(--gold) !important;
+  box-shadow:none !important;
+}
+.nav-faq-q,.nav-acct-circle{color:var(--gold) !important;}
+.nav-faq:hover .nav-faq-q{
+  background:var(--gold) !important;color:#000 !important;
+  box-shadow:0 8px 20px rgba(0,0,0,.5) !important;
+}
+.nav-acct-circle::after{background:var(--gold);}
+.sm-toggle{color:var(--gold) !important;}
+
+/* back to landing, top left */
+.np-back{
+  margin-right:clamp(12px,2vw,20px);
+  font-family:var(--font-mono);
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold);opacity:.8;
+  border-bottom:1px solid rgba(212,175,55,.45);padding-bottom:3px;
+  text-decoration:none;white-space:nowrap;
+  transition:opacity .3s var(--ease);
+}
+.np-back:hover,.np-back:focus-visible{opacity:1;}
+
+/* centered composition */
+.np-stage{
+  position:relative;min-height:100svh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:calc(var(--nav-h) + clamp(24px,4vw,48px)) var(--gutter) clamp(72px,10vw,120px);
+}
+.np-ghost{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:var(--font-display);font-size:clamp(200px,40vw,560px);line-height:1;
+  color:var(--gold);opacity:.04;pointer-events:none;user-select:none;white-space:nowrap;
+}
+.np-word{
+  position:relative;
+  font-family:var(--font-display);
+  font-size:clamp(40px,8.6vw,116px);
+  line-height:1;text-transform:uppercase;letter-spacing:-.01em;
+  color:var(--gold);
+}
+.np-soon{
+  position:relative;
+  margin-top:clamp(22px,3.6vw,36px);
+  font-family:var(--font-mono);
+  font-size:clamp(13px,1.8vw,18px);
+  letter-spacing:.3em;text-transform:uppercase;
+  color:var(--gold);
+}
+.np-more{
+  position:relative;
+  margin-top:clamp(30px,5vw,48px);
+  font-family:var(--font-mono);
+  font-size:clamp(10px,1.3vw,12px);
+  letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gold);opacity:.6;
+  border-bottom:1px solid rgba(212,175,55,.4);
+  padding-bottom:4px;
+  transition:opacity .3s var(--ease);
+}
+.np-more:hover,.np-more:focus-visible{opacity:1;}
+
+/* “N is equal to Nice.” — separate, left, subtle */
+.np-nice{
+  position:absolute;left:var(--gutter);bottom:clamp(60px,8vw,88px);
+  font-family:var(--font-mono);
+  font-size:clamp(10px,1.2vw,12px);
+  letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gold);opacity:.55;
+  text-align:left;
+}
+.np-micro{
+  position:absolute;left:var(--gutter);bottom:clamp(20px,3vw,32px);
+  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--gold);opacity:.4;
+}
+@media (max-width:640px){
+  .np-nice{bottom:clamp(72px,10vw,90px);}
+}
+@media (prefers-reduced-motion:reduce){
+  .np-word,.np-soon{opacity:1 !important;transform:none !important;}
+}
+</style>
+</head>
+<body>
+
+<div id="menu-root" aria-label="Main navigation"></div>
+
+<script>
+/* the top FAQ control on this page opens the dedicated N Pass FAQ */
+window.LARPMenuOverrides = { faqLink: 'n-pass-faq.html' };
+</script>
+
+<main class="wrap np-stage">
+  <span class="np-ghost" aria-hidden="true">N</span>
+  <h1 class="np-word" id="npWord">N-Word Pass</h1>
+  <p class="np-soon" id="npSoon">Coming Soon...</p>
+  <a class="np-more" href="n-pass-faq.html">Learn More →</a>
+  <p class="np-nice">N = Nice.</p>
+  <p class="np-micro">LARP / N Pass / 08</p>
+</main>
+
+<script src="app.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-init.js"></script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react" src="StaggeredMenu.jsx"></script>
+<script type="text/babel" data-presets="react" src="menu-mount.jsx"></script>
+
+<script>
+(function(){
+  if(!window.gsap) return;
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var word = document.getElementById('npWord');
+  var soon = document.getElementById('npSoon');
+
+  var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+  tl.fromTo(word, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 1.1 }, 0.1)
+    .fromTo(soon, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.9 }, 0.55);
+
+  /* header LARP™ logo: exact #D4AF37, same as the N-Word heading */
+  (function(){
+    var tries = 0;
+    function apply(){
+      var logo = document.querySelector('.sm-logo-img');
+      if(logo){
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="110" height="24" viewBox="0 0 110 24" fill="none"><text x="0" y="19" font-family="&apos;Archivo Black&apos;, &apos;Arial Black&apos;, sans-serif" font-size="19" letter-spacing="-0.5" fill="#D4AF37">LARP™</text></svg>';
+        logo.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+      }
+      if(!document.querySelector('.np-back')){
+        var left = document.querySelector('.sm-left');
+        if(left){
+          var back = document.createElement('a');
+          back.href = 'index.html';
+          back.className = 'np-back';
+          back.setAttribute('data-carry-session','');
+          back.textContent = 'Back to LARP™';
+          left.prepend(back);
+        }
+      }
+      if(!document.querySelector('.sm-logo-img') || !document.querySelector('.np-back')){
+        if(++tries < 40) setTimeout(apply, 50);
+      }
+    }
+    apply();
+  })();
+})();
+</script>
+</body>
+</html>

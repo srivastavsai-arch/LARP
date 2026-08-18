@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>N Pass FAQ · LARP™</title>
+<meta name="description" content="Everything you never asked about the N Word Pass, answered with a straight face.">
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="StaggeredMenu.css">
+<style>
+/* same refined gold system as the N Word Pass page */
+:root{--gold:#D4AF37;}
+html,body{background:#000;color:var(--gold);}
+body{background:#000;color:var(--gold);}
+:focus-visible{outline-color:var(--gold);}
+
+/* top controls: black + refined gold */
+.sm-logo-img{filter:invert(74%) sepia(52%) saturate(420%) hue-rotate(7deg) brightness(89%);}
+.staggered-menu-wrapper[data-open] .sm-logo-img{filter:none !important;}
+.nav-faq,.nav-account{color:var(--gold) !important;}
+.nav-faq-q,.nav-acct-circle,.sm-toggle{
+  background:#000 !important;
+  border-color:rgba(212,175,55,.45) !important;
+  color:var(--gold) !important;
+  box-shadow:none !important;
+}
+.nav-faq:hover .nav-faq-q{
+  background:var(--gold) !important;color:#000 !important;
+  box-shadow:0 8px 20px rgba(0,0,0,.5) !important;
+}
+.nav-acct-circle::after{background:var(--gold);}
+
+.faq-main{position:relative;}
+.faq-ghost{
+  position:absolute;right:var(--gutter);top:calc(var(--nav-h) + clamp(16px,3vw,36px));
+  font-family:var(--font-display);font-size:clamp(80px,18vw,260px);line-height:1;
+  color:var(--gold);opacity:.05;user-select:none;pointer-events:none;z-index:0;
+}
+.faq-main .page-title{font-size:clamp(44px,11vw,150px);color:var(--gold);}
+.page-eyebrow{color:var(--gold);opacity:.7;}
+.page-sub{color:var(--gold);opacity:.75;}
+.faq-list{position:relative;z-index:1;margin-top:clamp(30px,5vw,60px);}
+.fq{
+  display:grid;grid-template-columns:clamp(44px,6vw,90px) 1fr;gap:clamp(20px,4vw,64px);
+  padding:clamp(34px,6vw,60px) 0;border-top:1px solid rgba(212,175,55,.25);
+  align-items:start;
+}
+.fq:last-of-type{border-bottom:1px solid rgba(212,175,55,.25);}
+.fq-num{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;
+  color:var(--gold);opacity:.55;
+  padding-top:clamp(8px,1vw,16px);display:flex;align-items:center;gap:12px;
+}
+.fq-num .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex:0 0 7px;}
+.fq-q{
+  font-family:var(--font-display);font-size:clamp(28px,5.4vw,64px);
+  line-height:.96;text-transform:uppercase;letter-spacing:-.01em;max-width:22ch;
+  color:var(--gold);
+}
+.fq-line{width:clamp(40px,6vw,80px);height:1px;background:var(--gold);opacity:.5;transform-origin:left;margin-top:clamp(16px,2.5vw,26px);}
+.fq-a{
+  font-family:var(--font-body);font-size:clamp(15px,1.6vw,18px);line-height:1.7;
+  color:var(--gold);opacity:.8;
+  max-width:52ch;margin-top:clamp(16px,2.5vw,26px);
+  opacity:0;transform:translateY(20px);
+  will-change:opacity,transform;
+}
+.fq-a strong{font-weight:600;}
+.faq-end{
+  margin-top:clamp(40px,7vw,80px);display:flex;flex-direction:column;align-items:flex-start;gap:14px;
+}
+.faq-end .btn{background:var(--gold);color:#000;border-color:var(--gold);}
+.faq-end .btn:hover{background:#000;color:var(--gold);}
+
+/* footer on black */
+.site-footer{border-top:1px solid rgba(212,175,55,.25);}
+.footer-word{color:var(--gold);}
+.footer-links a{color:var(--gold);opacity:.75;}
+.footer-links a:hover{opacity:1;}
+.footer-meta{color:var(--gold);opacity:.55;}
+.footer-meta a{color:var(--gold);opacity:1;}
+
+@media (max-width:640px){
+  .fq{grid-template-columns:1fr;gap:12px;}
+  .fq-num{padding-top:0;gap:10px;}
+}
+@media (prefers-reduced-motion: reduce){
+  .fq-a{opacity:1 !important;transform:none !important;}
+  .fq-line{transform:scaleX(1) !important;}
+}
+html.no-gsap .fq-a{opacity:1 !important;transform:none !important;}
+html.no-gsap .fq-line{transform:scaleX(1) !important;}
+</style>
+</head>
+<body>
+
+<div id="menu-root" aria-label="Main navigation"></div>
+
+<main class="wrap faq-main">
+  <div class="faq-ghost" aria-hidden="true">N?</div>
+
+  <header class="page-head" style="position:relative;z-index:1;">
+    <div class="page-eyebrow">N Questions</div>
+    <h1 class="page-title">N word<br>pass FAQ.</h1>
+    <p class="page-sub">Eight answers about a pass that does not exist yet. We answered them anyway. That is how serious this is.</p>
+  </header>
+
+  <section class="faq-list" aria-label="N Word Pass frequently asked questions">
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>01</span>
+      <div>
+        <h2 class="fq-q">Is N the word you are thinking of?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">No. Calm down. N Word is not what you think it is. N simply means Nice. That is the whole reveal, and we did it in the first question, because we respect your time.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>02</span>
+      <div>
+        <h2 class="fq-q">What is the N Word Pass?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">A pass, for the word N, the nicest word we have. It does not exist yet, which has not stopped it from being very important.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>03</span>
+      <div>
+        <h2 class="fq-q">Why is it called N Word Pass?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">Because N is a word and this is a pass. We considered calling it the Nice Pass, but the mystery would have survived approximately four seconds.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>04</span>
+      <div>
+        <h2 class="fq-q">What does N stand for?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">Nice. It also stands for N. Both answers are correct. It is the most efficient equation we have ever published.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>05</span>
+      <div>
+        <h2 class="fq-q">Why does it say N = Nice?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">It is an equation we balanced in a room, at night, with the lights off. It held. Some equations are simply true.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>06</span>
+      <div>
+        <h2 class="fq-q">Is the N Word Pass real?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">As real as the letter itself. The letter is real. The pass is coming soon.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>07</span>
+      <div>
+        <h2 class="fq-q">When will it be available?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">Coming Soon... The dots carry the suspense. A single dot would imply doubt, three dots imply that something is on its way and it is very nice.</p>
+      </div>
+    </div>
+    <div class="fq">
+      <span class="fq-num"><span class="dot"></span>08</span>
+      <div>
+        <h2 class="fq-q">How does it fit into LARP?</h2>
+        <div class="fq-line"></div>
+        <p class="fq-a">LARP makes pretending official. The N Word Pass makes nice official. It is the natural next step for a universe built on the letter N.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="faq-end">
+    <p class="page-sub" style="margin-top:0;">The pass is waiting. So is the letter.</p>
+    <a href="n-pass.html" class="btn btn-solid">
+      Back to N Word Pass
+      <svg viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.4"/></svg>
+    </a>
+  </div>
+</main>
+
+<footer class="site-footer wrap">
+  <div class="footer-row">
+    <div class="footer-word">LARP™</div>
+    <div class="footer-links">
+      <a href="index.html" data-carry-session>Home</a>
+      <a href="index.html#manifesto" data-carry-session>Manifesto</a>
+      <a href="index.html#membership" data-carry-session>Membership</a>
+      <a href="license.html" data-carry-session>License</a>
+      <a href="faq.html" data-carry-session>FAQ</a>
+      <a href="privacy.html" data-carry-session>Privacy</a>
+      <a href="disclaimer.html" data-carry-session>Disclaimer</a>
+      <a href="account.html" data-carry-session data-account-link>Account</a>
+    </div>
+  </div>
+  <div class="footer-meta" style="margin-top:20px;">© 2026 LARP™ · License to LARP. All pretending reserved.</div>
+  <div class="footer-meta" style="margin-top:10px;">Designed &amp; built by <a href="https://vortexflowmedia.vercel.app/" target="_blank" rel="noopener noreferrer">VortexFlow Media</a></div>
+</footer>
+
+<script src="app.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="firebase-init.js"></script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react" src="StaggeredMenu.jsx"></script>
+<script type="text/babel" data-presets="react" src="menu-mount.jsx"></script>
+
+<script>
+(function(){
+  if(!window.gsap || !window.ScrollTrigger){
+    document.documentElement.classList.add('no-gsap');
+    return;
+  }
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.utils.toArray('.fq').forEach(function(block){
+    var a = block.querySelector('.fq-a');
+    var line = block.querySelector('.fq-line');
+    if(a){
+      gsap.to(a, {
+        opacity:1, y:0, duration:.9, ease:'power3.out',
+        scrollTrigger:{ trigger:block, start:'top 82%' }
+      });
+    }
+    if(line){
+      gsap.fromTo(line, { scaleX:0 }, {
+        scaleX:1, duration:1, ease:'power3.inOut',
+        scrollTrigger:{ trigger:block, start:'top 85%' }
+      });
+    }
+  });
+})();
+</script>
+</body>
+</html>

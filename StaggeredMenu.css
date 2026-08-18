@@ -324,7 +324,10 @@
   right: 0;
   width: clamp(260px, 38vw, 420px);
   height: 100%;
-  background: rgba(255, 255, 255, 0.94);
+  background:
+    radial-gradient(120% 60% at 100% 0%, rgba(212, 175, 55, 0.07), rgba(255, 255, 255, 0) 60%),
+    rgba(250, 248, 243, 0.96);
+  border-left: 1px solid rgba(212, 175, 55, 0.4);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   display: flex;
